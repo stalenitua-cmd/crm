@@ -568,7 +568,14 @@ th{position:relative}
    СТАЛЕНІТ CRM v8 — Google Sheets sync
    ══════════════════════════════════════ */
 
-var GS_URL='https://script.google.com/macros/s/AKfycbxW9ZzQeU77tsndJLWSIXU9VXGN-Xc-viVVYCK6xiW71tswJvgrgpJhujZtfkJnlQ/exec';
+/* ══════════════════════════════════════
+   GITHUB API STORAGE CONFIG
+   Встав свій токен нижче
+   ══════════════════════════════════════ */
+var GITHUB_TOKEN = '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';
+var GITHUB_REPO = 'stalenitua-cmd/crm';
+var GITHUB_FILE = 'crm_data.json';
+var GITHUB_API = 'https://api.github.com';
 var clients=[];
 var nextId=1;
 
@@ -582,78 +589,91 @@ function hideLoading(){
   if(ov)ov.style.display='none';
 }
 
-/* ─ JSONP helper ─ */
-function jsonp(url, callback){
-  var cbName='_gs_cb_'+Date.now();
-  var script=document.createElement('script');
-  var done=false;
-  window[cbName]=function(data){
-    if(done)return;done=true;
-    try{document.head.removeChild(script);}catch(e){}
-    delete window[cbName];
-    callback(null,data);
-  };
-  script.onerror=function(){
-    if(done)return;done=true;
-    try{document.head.removeChild(script);}catch(e){}
-    delete window[cbName];
-    callback(new Error('JSONP error'));
-  };
-  script.src=url+(url.indexOf('?')>=0?'&':'?')+'callback='+cbName;
-  document.head.appendChild(script);
-}
+/* ─ GITHUB API STORAGE ─ */
 
-/* ─ LOAD FROM GOOGLE SHEETS ─ */
 function loadFromGS(){
   showLoading('Завантаження даних з хмари...');
-  jsonp(GS_URL+'?action=getAll', function(err, data){
-    if(err){showT('Помилка завантаження','wn');hideLoading();return;}
-    if(data.error){showT('Помилка: '+data.error,'wn');hideLoading();return;}
-    clients=data.clients.filter(function(c){
-      return c._deleted!=='true'&&c._deleted!=='TRUE'&&c._deleted!==true;
-    }).map(function(c){
-      var at=c.added_at||'';
-      if(at.length>10){var d=new Date(at);at=isNaN(d)?'':d.toISOString().split('T')[0];}
+  fetch(GITHUB_API+'/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
+    headers:{
+      'Authorization':'token '+GITHUB_TOKEN,
+      'Accept':'application/vnd.github.v3+json'
+    }
+  })
+  .then(function(r){
+    if(r.status===404){return {notFound:true};}
+    return r.json();
+  })
+  .then(function(data){
+    if(data.notFound){
+      hideLoading();initObl();applyCV();restoreSortHeader();ra();
+      showT('База порожня — додайте першого клієнта','ok');
+      return;
+    }
+    if(data.message){throw new Error(data.message);}
+    var decoded=JSON.parse(atob(data.content.replace(/
+/g,'')));
+    clients=(decoded.clients||[]).map(function(c){
       return Object.assign({},c,{
         id:parseInt(c.id)||0,
-        in_list:c.in_list==='TRUE'||c.in_list===true||c.in_list==='true',
+        in_list:c.in_list===true||c.in_list==='true',
         _deleted:false,
-        _email:c._email||c.email||'',
-        added_at:at
+        _email:c._email||c.email||''
       });
     });
-    nextId=parseInt(data.nextId)||clients.length+1;
-    hideLoading();
-    initObl();applyCV();restoreSortHeader();ra();
+    nextId=decoded.nextId||clients.length+1;
+    hideLoading();initObl();applyCV();restoreSortHeader();ra();
     showT('Завантажено '+clients.length+' клієнтів','ok');
+  })
+  .catch(function(e){
+    hideLoading();
+    showT('Помилка: '+e.message,'wn');
+    console.error(e);
   });
 }
 
-/* ─ SAVE TO GOOGLE SHEETS (JSONP row by row) ─ */
+var _ghSha='';
+
 function saveToGS(){
-  saveClientsToGS(clients, function(ok){
-    if(ok) showT('Збережено в Google Sheets ✓','ok');
+  saveClientsToGS(clients,function(ok){
+    if(ok)showT('Збережено ✓','ok');
     else showT('Помилка збереження','wn');
   });
 }
 
-function saveClientsToGS(data, callback){
-  // Step 1: clear sheet via JSONP
-  jsonp(GS_URL+'?action=clear', function(err, d){
-    if(err||!d||!d.ok){console.error('Clear error',err,d);callback(false);return;}
-    // Step 2: add rows one by one via JSONP
-    var idx=0;
-    function sendNext(){
-      if(idx>=data.length){callback(true);return;}
-      var c=data[idx];
-      var url=GS_URL+'?action=addRow&row='+encodeURIComponent(JSON.stringify(c));
-      jsonp(url, function(err2, d2){
-        if(err2||!d2||!d2.ok){console.error('Row error',err2,d2);callback(false);return;}
-        idx++;sendNext();
-      });
+function saveClientsToGS(data,callback){
+  var payload={clients:data,nextId:nextId};
+  var encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  
+  // First get current SHA
+  fetch(GITHUB_API+'/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
+    headers:{
+      'Authorization':'token '+GITHUB_TOKEN,
+      'Accept':'application/vnd.github.v3+json'
     }
-    sendNext();
-  });
+  })
+  .then(function(r){return r.status===404?{sha:null}:r.json();})
+  .then(function(existing){
+    var body={
+      message:'CRM update '+new Date().toISOString(),
+      content:encoded
+    };
+    if(existing.sha)body.sha=existing.sha;
+    return fetch(GITHUB_API+'/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
+      method:'PUT',
+      headers:{
+        'Authorization':'token '+GITHUB_TOKEN,
+        'Accept':'application/vnd.github.v3+json',
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify(body)
+    });
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.content)callback(true);
+    else{console.error(d);callback(false);}
+  })
+  .catch(function(e){console.error(e);callback(false);});
 }
 
 /* ─ MIGRATE OLD DATA ─ */
