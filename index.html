@@ -620,7 +620,7 @@ function loadFromGS(){
     });
 }
 
-/* ─ SAVE TO GOOGLE SHEETS (via GET chunks) ─ */
+/* ─ SAVE TO GOOGLE SHEETS (row by row via GET) ─ */
 function saveToGS(){
   saveClientsToGS(clients, function(ok){
     if(ok) showT('Збережено в Google Sheets ✓','ok');
@@ -629,24 +629,28 @@ function saveToGS(){
 }
 
 function saveClientsToGS(data, callback){
-  var CHUNK=50;
-  var total=data.length;
-  var chunks=[];
-  for(var i=0;i<total;i+=CHUNK) chunks.push(data.slice(i,i+CHUNK));
-  
-  function sendChunk(idx, mode){
-    if(idx>=chunks.length){callback(true);return;}
-    var m=idx===0?mode:'append';
-    var url=GS_URL+'?action=saveChunk&mode='+m+'&data='+encodeURIComponent(JSON.stringify(chunks[idx]));
-    fetch(url)
-      .then(function(r){return r.json();})
-      .then(function(d){
-        if(d.ok) sendChunk(idx+1,'append');
-        else{console.error(d);callback(false);}
-      })
-      .catch(function(e){console.error(e);callback(false);});
-  }
-  sendChunk(0,'replace');
+  // Step 1: clear sheet
+  fetch(GS_URL+'?action=clear')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d.ok){callback(false);return;}
+      // Step 2: add rows one by one
+      var idx=0;
+      function sendNext(){
+        if(idx>=data.length){callback(true);return;}
+        var c=data[idx];
+        var url=GS_URL+'?action=addRow&row='+encodeURIComponent(JSON.stringify(c));
+        fetch(url)
+          .then(function(r){return r.json();})
+          .then(function(d){
+            if(d.ok){idx++;sendNext();}
+            else{console.error('Row error:',d);callback(false);}
+          })
+          .catch(function(e){console.error(e);callback(false);});
+      }
+      sendNext();
+    })
+    .catch(function(e){console.error(e);callback(false);});
 }
 
 /* ─ MIGRATE OLD DATA ─ */
