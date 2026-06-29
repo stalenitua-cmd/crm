@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сталеніт — CRM</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap');
+
+:root{
+  --bg:#f5f6f8;
+  --surface:#ffffff;
+  --surface2:#f0f2f5;
+  --nav:#1c2333;
+  --nav2:#252f45;
+  --border:#e2e5ea;
+  --border2:#d1d5db;
+  --accent:#c8a96e;
+  --accent2:#e6c98a;
+  --accent-dk:#a8873e;
+  --text:#1c2333;
+  --text2:#374151;
+  --muted:#6b7280;
+  --muted2:#9ca3af;
+  --success:#16a34a;
+  --success-bg:#f0fdf4;
+  --warning:#d97706;
+  --warning-bg:#fffbeb;
+  --danger:#dc2626;
+  --danger-bg:#fef2f2;
+  --blue:#2563eb;
+  --blue-bg:#eff6ff;
+  --row-hover:#f8f9fb;
+  --row-stripe:#fafbfc;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER (dark navy like site) ── */
+header{
+  background:var(--nav);border-bottom:2px solid var(--accent);
+  padding:0 24px;display:flex;align-items:center;justify-content:space-between;
+  height:58px;position:sticky;top:0;z-index:300;gap:14px
+}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-icon{
+  width:34px;height:34px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:17px;color:#1c2333
+}
+.logo-text{font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.05em;color:#fff}
+.logo-sub{font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:.12em}
+.hm{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
+.schip{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;padding:3px 12px;font-size:11px;color:rgba(255,255,255,.65);white-space:nowrap
+}
+.schip strong{color:var(--accent)}
+.schip.w strong{color:#fbbf24}
+.schip.g strong{color:#4ade80}
+.hr{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.btn-add{
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:7px;padding:7px 16px;
+  color:#1c2333;font-weight:700;font-size:12px;
+  cursor:pointer;font-family:inherit;transition:opacity .2s,transform .15s;white-space:nowrap
+}
+.btn-add:hover{opacity:.88;transform:translateY(-1px)}
+.btn-hdr{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.75);border-radius:7px;padding:7px 13px;
+  font-size:12px;cursor:pointer;font-family:inherit;transition:all .18s;white-space:nowrap
+}
+.btn-hdr:hover{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)}
+.btn-hdr.green:hover{border-color:#4ade80;color:#4ade80}
+.btn-hdr.blue:hover{border-color:#60a5fa;color:#60a5fa}
+
+/* ── TOOLBAR ── */
+.toolbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:10px 24px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  position:sticky;top:58px;z-index:200;
+  box-shadow:0 1px 4px rgba(0,0,0,.06)
+}
+.sw{position:relative;flex:1;min-width:180px;max-width:360px}
+.sw .ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:13px;pointer-events:none}
+input[type=search],.fi,.fta,.fd{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:7px;padding:7px 10px 7px 32px;font-size:12.5px;width:100%;
+  outline:none;transition:border-color .2s,box-shadow .2s;font-family:inherit
+}
+input[type=search]:focus,.fi:focus,.fta:focus,.fd:focus{
+  border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,169,110,.12)
+}
+select,.di{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:7px;padding:7px 10px;font-size:12px;cursor:pointer;
+  outline:none;transition:border-color .2s;font-family:inherit;flex-shrink:0
+}
+select:focus,.di:focus{border-color:var(--accent)}
+.fi{padding:7px 10px}
+.fta{padding:7px 10px;resize:vertical;min-height:60px}
+.fd{padding:7px 10px;color-scheme:light}
+.fg{display:flex;gap:6px;flex-wrap:wrap}
+.fbtn{
+  background:transparent;border:1px solid var(--border2);color:var(--muted);
+  border-radius:16px;padding:5px 12px;font-size:11.5px;cursor:pointer;
+  font-family:inherit;font-weight:500;transition:all .16s;white-space:nowrap
+}
+.fbtn:hover{border-color:var(--accent);color:var(--accent-dk);background:rgba(200,169,110,.06)}
+.fbtn.active{background:var(--accent);border-color:var(--accent-dk);color:#fff;font-weight:600;
+  box-shadow:0 2px 8px rgba(200,169,110,.35)}
+.cbadge{
+  margin-left:auto;background:var(--surface2);border:1px solid var(--border);
+  border-radius:7px;padding:5px 12px;font-size:11px;color:var(--muted);white-space:nowrap
+}
+
+/* ── DATE ROW ── */
+.drow{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:7px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap
+}
+.drow label{font-size:11px;color:var(--muted);white-space:nowrap;font-weight:500}
+
+/* ── REMINDER BANNER ── */
+.rb{
+  background:var(--warning-bg);border-bottom:2px solid #fcd34d;
+  padding:8px 24px;display:none;align-items:center;gap:10px;flex-wrap:wrap
+}
+.rb.show{display:flex}
+.rbt{font-size:12px;font-weight:600;color:var(--warning)}
+.rbi{
+  background:#fff;border:1px solid #fcd34d;border-radius:6px;
+  padding:3px 10px;font-size:11px;color:var(--warning);cursor:pointer;transition:background .15s
+}
+.rbi:hover{background:#fef3c7}
+
+/* ── TABLE WRAPPER ── */
+.twrap{overflow-x:auto;background:var(--surface)}
+
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+
+/* Sticky thead */
+thead tr{
+  background:var(--surface2);
+  border-bottom:2px solid var(--border2);
+}
+th{
+  padding:0;
+  text-align:left;
+  font-size:10px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);font-weight:700;
+  white-space:nowrap;
+  position:sticky;top:0;background:var(--surface2);z-index:50;
+  border-right:1px solid var(--border);
+  transition:width .2s;
+}
+th:last-child{border-right:none}
+
+/* TH INNER — label + sort + hide-btn */
+.thi{
+  display:flex;align-items:center;gap:3px;
+  padding:9px 10px;
+  cursor:pointer;user-select:none;
+  transition:background .15s;
+  min-height:36px;
+}
+th.ns .thi{cursor:default}
+.thi:hover{background:rgba(0,0,0,.04)}
+th.ns .thi:hover{background:transparent}
+.th-lbl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2}
+.th-sort{font-size:10px;color:var(--muted2);flex-shrink:0}
+th.sa .th-sort::after{content:"↑";color:var(--accent-dk)}
+th.sd .th-sort::after{content:"↓";color:var(--accent-dk)}
+
+/* Hide-eye button inside th */
+.th-eye{
+  width:18px;height:18px;flex-shrink:0;
+  background:none;border:none;padding:0;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--muted2);border-radius:3px;font-size:11px;line-height:1;
+  opacity:0;transition:opacity .15s,background .15s;
+}
+th:hover .th-eye{opacity:1}
+th.col-hidden .th-eye{opacity:1;color:var(--accent-dk)}
+
+/* HIDDEN COLUMN STATE:
+   - th becomes narrow pill with just the restore button
+   - NO strikethrough, NO full label — clean pill */
+th.col-hidden{
+  width:28px !important;
+  min-width:28px;
+  overflow:hidden;
+}
+th.col-hidden .thi{
+  padding:9px 5px;
+  justify-content:center;
+}
+th.col-hidden .th-lbl{display:none}
+th.col-hidden .th-sort{display:none}
+th.col-hidden .th-eye{
+  opacity:1;
+  color:var(--accent-dk);
+  background:rgba(200,169,110,.12);
+  border-radius:4px;
+  width:18px;height:18px;
+  font-size:12px;
+}
+th.col-hidden .th-eye:hover{background:rgba(200,169,110,.25)}
+
+/* colgroup col for hidden cols */
+col.hidden-col{width:28px}
+
+/* TBODY */
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:var(--row-hover)}
+tbody tr:nth-child(even){background:var(--row-stripe)}
+tbody tr:nth-child(even):hover{background:var(--row-hover)}
+tbody tr.has-em td:first-child{border-left:3px solid var(--success)}
+tbody tr.no-em  td:first-child{border-left:3px solid var(--warning)}
+tbody tr.nr td:first-child{border-left:3px solid var(--accent)}
+
+td{
+  padding:7px 10px;vertical-align:middle;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0;
+  border-right:1px solid var(--border);color:var(--text2);
+}
+td:last-child{border-right:none}
+
+/* hidden td */
+td.hidden-td{display:none}
+
+.ti{color:var(--muted2);font-size:11px;text-align:center;font-weight:500}
+.tc{font-weight:600;color:var(--text)}
+.op{
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--muted);border-radius:8px;padding:2px 8px;
+  font-size:11px;display:inline-block;max-width:100%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.ev{color:var(--blue);font-size:12px}
+.em{
+  display:inline-flex;align-items:center;gap:3px;
+  background:var(--warning-bg);border:1px solid #fcd34d;
+  color:var(--warning);border-radius:6px;padding:2px 7px;font-size:11px
+}
+.by{
+  display:inline-flex;align-items:center;gap:3px;
+  background:var(--success-bg);border:1px solid #86efac;
+  color:var(--success);border-radius:10px;padding:2px 8px;font-size:11px;font-weight:500
+}
+.bn{
+  display:inline-flex;align-items:center;gap:3px;
+  background:var(--blue-bg);border:1px solid #bfdbfe;
+  color:var(--blue);border-radius:10px;padding:2px 8px;font-size:11px
+}
+.dc{font-size:11px;color:var(--muted)}
+.dc.od{color:var(--danger);font-weight:600;background:var(--danger-bg);padding:1px 5px;border-radius:4px}
+.dc.td{color:var(--warning);font-weight:600;background:var(--warning-bg);padding:1px 5px;border-radius:4px}
+.dc.sn{color:var(--success);font-weight:500}
+
+/* NOTES TOOLTIP */
+.nc{position:relative}
+.nf{
+  display:none;position:fixed;z-index:999;
+  background:#1c2333;color:#f9fafb;
+  border:1px solid #374151;border-radius:9px;
+  padding:10px 14px;width:300px;font-size:12px;line-height:1.65;
+  white-space:normal;word-break:break-word;
+  box-shadow:0 8px 28px rgba(0,0,0,.25);pointer-events:none
+}
+.nc:hover .nf{display:block}
+
+/* ROW ACTIONS */
+.ra{display:flex;gap:4px;justify-content:flex-end;opacity:0;transition:opacity .15s}
+tr:hover .ra{opacity:1}
+.ab{
+  background:none;border:1px solid var(--border2);color:var(--muted);
+  border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;
+  font-family:inherit;transition:all .14s
+}
+.ab:hover{border-color:var(--accent);color:var(--accent-dk);background:rgba(200,169,110,.06)}
+.ab.dl:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-bg)}
+
+.empty-row td{text-align:center;padding:60px 20px;color:var(--muted2);border:none}
+
+/* ── MODAL ── */
+.mo{display:none;position:fixed;inset:0;background:rgba(28,35,51,.6);z-index:600;
+  align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.mo.open{display:flex}
+.mb{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:26px 28px;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,.2)
+}
+.mt{
+  font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;color:var(--nav);
+  margin-bottom:20px;padding-right:28px;
+  text-transform:uppercase;letter-spacing:.04em;
+  border-bottom:2px solid var(--accent);padding-bottom:12px
+}
+.mc{position:absolute;top:18px;right:18px;background:none;border:none;
+  color:var(--muted2);font-size:20px;cursor:pointer;transition:color .2s;line-height:1}
+.mc:hover{color:var(--text)}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:13px 18px}
+.ff{display:flex;flex-direction:column;gap:5px}
+.ff.full{grid-column:1/-1}
+.fl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.mf{display:flex;gap:9px;margin-top:20px;padding-top:14px;border-top:1px solid var(--border)}
+.bp{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;
+  color:#1c2333;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:opacity .2s;
+  box-shadow:0 2px 8px rgba(200,169,110,.35)
+}
+.bp:hover{opacity:.88}
+.bs{background:none;border:1px solid var(--border2);color:var(--muted);
+  border-radius:7px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:inherit;transition:all .2s}
+.bs:hover{border-color:var(--accent);color:var(--text)}
+.sl{
+  font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-dk);
+  font-weight:700;padding:8px 0 2px;border-top:2px solid var(--border);margin-top:6px;grid-column:1/-1
+}
+
+/* IMPORT MODAL */
+.imp-preview{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.imp-chip{border-radius:8px;padding:8px 14px;font-size:12px;font-weight:500}
+.imp-chip.ok{background:var(--success-bg);border:1px solid #86efac;color:var(--success)}
+.imp-chip.ac{background:rgba(200,169,110,.1);border:1px solid var(--accent);color:var(--accent-dk)}
+.imp-chip.er{background:var(--danger-bg);border:1px solid #fca5a5;color:var(--danger)}
+.mapgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:16px}
+.maprow{display:flex;flex-direction:column;gap:3px}
+.maplabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:22px;right:22px;
+  background:var(--nav);color:#f9fafb;
+  border-radius:10px;padding:11px 18px;font-size:13px;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:9999;
+  transform:translateY(8px);opacity:0;transition:all .3s;pointer-events:none;
+  border-left:4px solid var(--accent)
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-left-color:var(--success)}
+.toast.wn{border-left-color:var(--warning)}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted2)}
+
+@media(max-width:900px){
+  header{padding:0 14px}.toolbar,.drow{padding:8px 14px}
+  .hm{display:none}.fg2{grid-template-columns:1fr}.mapgrid{grid-template-columns:1fr}
+}
+/* ── COLUMN RESIZE HANDLE ── */
+th{position:relative}
+.rh{
+  position:absolute;right:0;top:0;bottom:0;width:5px;
+  cursor:col-resize;z-index:10;
+  background:transparent;
+  transition:background .15s;
+}
+.rh:hover,.rh:active{background:var(--accent);opacity:.6}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">С</div>
+    <div><div class="logo-text">Сталеніт</div><div class="logo-sub">CRM · База клієнтів</div></div>
+  </div>
+  <div class="hm">
+    <div class="schip" id="sTotal">Всього: <strong>0</strong></div>
+    <div class="schip w" id="sNoEmail">&#9888; Без email: <strong>0</strong></div>
+    <div class="schip g" id="sInList">&#128231; В розсилці: <strong>0</strong></div>
+    <div class="schip w" id="sToday" style="cursor:pointer" onclick="setDQ('today')">&#128197; Дзвонити сьогодні: <strong>0</strong></div>
+  </div>
+  <div class="hr">
+    <button class="btn-hdr" onclick="dlTemplate()">&#128203; Шаблон</button>
+    <button class="btn-hdr green" onclick="doExport()">&#11015; Експорт</button>
+    <button class="btn-hdr green" onclick="saveToGS()" title="Зберегти в Google Sheets">&#9729; Зберегти</button>
+      <button class="btn-hdr blue" onclick="document.getElementById('impFile').click()">&#11014; Імпорт</button>
+    <input type="file" id="impFile" accept=".xlsx,.xls" style="display:none" onchange="doImport(this)">
+    <button class="btn-add" onclick="openAdd()"><span style="font-size:18px;font-weight:400;line-height:1">+</span> Новий клієнт</button>
+  </div>
+</header>
+
+<!-- REMINDER BANNER -->
+<div class="rb" id="rbanner">
+  <span class="rbt">&#128222; Сьогодні треба зв'язатись:</span>
+  <div id="rItems" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="sw">
+    <span class="ico">&#128269;</span>
+    <input type="search" id="srch" placeholder="Пошук по компанії, контакту, email, телефону…" autocomplete="off">
+  </div>
+  <select id="oblSel"><option value="">Всі регіони</option></select>
+  <div class="fg">
+    <button class="fbtn active" data-f="all">Всі</button>
+    <button class="fbtn" data-f="has_email">&#9993; З email</button>
+    <button class="fbtn" data-f="no_email">&#9888; Без email</button>
+    <button class="fbtn" data-f="in_list">&#128231; В розсилці</button>
+    <button class="fbtn" data-f="not_in_list">Не в розсилці</button>
+    <button class="fbtn" data-f="new_today">&#128274; Нові сьогодні</button>
+  </div>
+  <div class="cbadge" id="cnt">0 записів</div>
+</div>
+
+<!-- DATE FILTER ROW -->
+<div class="drow">
+  <label>&#128197; Зв'язатись:</label>
+  <select class="di" id="dqSel" onchange="onDQ()" style="min-width:150px">
+    <option value="">— всі —</option>
+    <option value="today">Сьогодні</option>
+    <option value="tomorrow">Завтра</option>
+    <option value="week">Цей тиждень</option>
+    <option value="overdue">Прострочені</option>
+  </select>
+  <label>або дата:</label>
+  <input type="date" class="di" id="dExact" onchange="onDE()" style="max-width:160px">
+  <label style="margin-left:12px">&#128203; Додано в базу:</label>
+  <select class="di" id="addSel" onchange="ra()" style="min-width:150px">
+    <option value="">— всі —</option>
+    <option value="today">Сьогодні</option>
+    <option value="week">За тиждень</option>
+    <option value="month">За місяць</option>
+  </select>
+</div>
+
+<!-- TABLE -->
+<div class="twrap">
+<table id="tbl">
+  <colgroup id="cgrp">
+    <col id="ci"  data-k="idx"          style="width:38px">
+    <col id="cc"  data-k="company"      style="width:210px">
+    <col id="co"  data-k="oblast"       style="width:120px">
+    <col id="cn"  data-k="contact"      style="width:155px">
+    <col id="cp"  data-k="phone"        style="width:155px">
+    <col id="ce"  data-k="email"        style="width:195px">
+    <col id="ced" data-k="edrpou"       style="width:92px">
+    <col id="cd"  data-k="delivery"     style="width:90px">
+    <col id="cno" data-k="notes"        style="min-width:140px">
+    <col id="ccd" data-k="contact_date" style="width:112px">
+    <col id="cnc" data-k="next_contact" style="width:116px">
+    <col id="ca"  data-k="added_at"     style="width:102px">
+    <col id="cil" data-k="in_list"      style="width:108px">
+    <col id="cac" data-k="actions"      style="width:72px">
+  </colgroup>
+  <thead>
+  <tr id="thead-row">
+    <th class="ns" data-k="idx">
+      <div class="thi"><span class="th-lbl">#</span></div></th>
+    <th data-k="company">
+      <div class="thi"><span class="th-lbl">Підприємство</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'company')" title="Приховати">&#128065;</button></div></th>
+    <th data-k="oblast">
+      <div class="thi"><span class="th-lbl">Область</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'oblast')" title="Приховати">&#128065;</button></div></th>
+    <th data-k="contact">
+      <div class="thi"><span class="th-lbl">Контакт</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'contact')" title="Приховати">&#128065;</button></div></th>
+    <th class="ns" data-k="phone">
+      <div class="thi"><span class="th-lbl">Телефон</span><button class="th-eye" onclick="thToggle(event,'phone')" title="Приховати">&#128065;</button></div></th>
+    <th data-k="email">
+      <div class="thi"><span class="th-lbl">Email</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'email')" title="Приховати">&#128065;</button></div></th>
+    <th data-k="edrpou">
+      <div class="thi"><span class="th-lbl">ЄДРПОУ</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'edrpou')" title="Приховати">&#128065;</button></div></th>
+    <th data-k="delivery">
+      <div class="thi"><span class="th-lbl">Доставка</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'delivery')" title="Приховати">&#128065;</button></div></th>
+    <th class="ns" data-k="notes">
+      <div class="thi"><span class="th-lbl">Нотатки</span><button class="th-eye" onclick="thToggle(event,'notes')" title="Приховати">&#128065;</button></div></th>
+    <th data-k="contact_date">
+      <div class="thi"><span class="th-lbl">Дата контакту</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'contact_date')" title="Приховати">&#128065;</button></div></th>
+    <th data-k="next_contact">
+      <div class="thi"><span class="th-lbl">Зв'язатись</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'next_contact')" title="Приховати">&#128065;</button></div></th>
+    <th data-k="added_at">
+      <div class="thi"><span class="th-lbl">Дата в базі</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'added_at')" title="Приховати">&#128065;</button></div></th>
+    <th data-k="in_list">
+      <div class="thi"><span class="th-lbl">Розсилка</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'in_list')" title="Приховати">&#128065;</button></div></th>
+    <th class="ns" data-k="actions" style="text-align:right">
+      <div class="thi" style="justify-content:flex-end"><span class="th-lbl">Дії</span></div></th>
+  </tr>
+  </thead>
+  <tbody id="tb"></tbody>
+</table>
+</div>
+
+<!-- MAIN MODAL -->
+<div class="mo" id="mainMo">
+  <div class="mb">
+    <div class="mt" id="moTitle">Новий клієнт</div>
+    <button class="mc" onclick="closeMo()">&#10005;</button>
+    <div class="fg2">
+      <div class="ff full"><div class="fl">Підприємство *</div><input class="fi" id="fc" type="text" placeholder="Назва компанії" required></div>
+      <div class="ff"><div class="fl">Область</div><input class="fi" id="fo" type="text" placeholder="Київська"></div>
+      <div class="ff"><div class="fl">ЄДРПОУ</div><input class="fi" id="fed" type="text" placeholder="12345678" maxlength="10"></div>
+      <div class="ff"><div class="fl">Контактна особа</div><input class="fi" id="fco" type="text" placeholder="ПІБ / посада"></div>
+      <div class="ff"><div class="fl">Телефон</div><input class="fi" id="fph" type="text" placeholder="(067) 000-00-00"></div>
+      <div class="ff"><div class="fl">Email</div><input class="fi" id="fem" type="email" placeholder="email@company.ua"></div>
+      <div class="ff"><div class="fl">Доставка</div>
+        <select class="fi" id="fdl" onchange="onDlChange()">
+          <option value="">— не вказано —</option>
+          <option value="Нова Пошта">&#128230; Нова Пошта</option>
+          <option value="САТ">&#128666; САТ</option>
+          <option value="Транспорт">&#128652; Транспорт</option>
+        </select>
+      </div>
+      <div class="ff full" id="dlNoteWrap" style="display:none">
+        <div class="fl" id="dlNoteLabel">Деталі доставки</div>
+        <textarea class="fta" id="fdlnote" placeholder="Відділення, місто, адреса…" style="min-height:52px"></textarea>
+      </div>
+      <div class="sl">&#128197; Дати</div>
+      <div class="ff"><div class="fl">Дата контакту</div><input class="fd" id="fcd" type="date"></div>
+      <div class="ff"><div class="fl">Зв'язатись (нагадування)</div><input class="fd" id="fnc" type="date"></div>
+      <div class="sl">&#128221; Нотатки</div>
+      <div class="ff full"><div class="fl">Нотатки / деталі</div><textarea class="fta" id="fno" placeholder="Що купують, статус переговорів…"></textarea></div>
+      <div class="ff full"><div class="fl">Результат / коментар</div><textarea class="fta" id="fre" placeholder="Підсумок останнього контакту…"></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="bp" id="moSaveBtn" onclick="saveMo()">&#128190; Зберегти</button>
+      <button class="bs" onclick="closeMo()">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="mo" id="impMo">
+  <div class="mb" style="max-width:580px">
+    <div class="mt">&#11014; Імпорт клієнтів з Excel</div>
+    <button class="mc" onclick="closeImpMo()">&#10005;</button>
+    <div id="impPrev"></div>
+    <div id="impMap" style="display:none">
+      <div style="font-size:11.5px;color:var(--muted);margin-bottom:12px;line-height:1.7">
+        Перевірте відповідність колонок. За потреби виправте вручну.
+      </div>
+      <div class="mapgrid" id="mapGrid"></div>
+    </div>
+    <div class="mf" id="impFoot" style="display:none">
+      <button class="bp" id="impConfBtn" onclick="confirmImp()">&#9989; Додати клієнтів</button>
+      <button class="bs" onclick="closeImpMo()">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<!-- MIGRATE BANNER -->
+<div id="migrateBanner" style="background:#eff6ff;border-bottom:2px solid #2563eb;padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+  <span style="font-size:13px;font-weight:600;color:#1d4ed8;">&#128230; Стара база даних (264 клієнтів). Перенести в Google Sheets?</span>
+  <button onclick="migrateOldData()" style="background:linear-gradient(135deg,#2563eb,#3b82f6);border:none;border-radius:7px;padding:7px 18px;color:#fff;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;">&#11014; Перенести в хмару</button>
+  <button onclick="document.getElementById('migrateBanner').style.display='none'" style="background:transparent;border:1px solid #93c5fd;border-radius:7px;padding:7px 14px;color:#2563eb;font-size:12px;cursor:pointer;font-family:inherit;">&#10005; Закрити</button>
+</div>
+<script>
+/* ══════════════════════════════════════
+   СТАЛЕНІТ CRM v8 — Google Sheets sync
+   ══════════════════════════════════════ */
+
+var GS_URL='https://script.google.com/macros/s/AKfycbzUXBatXrd1NJxozhDIbLlsaM6tKaiIa3wgQ_uoGNjVweTwsBhgcckH_Nu-b4y1eHhI/exec';
+var clients=[];
+var nextId=1;
+
+/* ─ LOADING OVERLAY ─ */
+function showLoading(msg){
+  var ov=document.getElementById('gsOverlay');
+  if(ov){ov.style.display='flex';ov.querySelector('.gs-msg').textContent=msg||'Завантаження...';}
+}
+function hideLoading(){
+  var ov=document.getElementById('gsOverlay');
+  if(ov)ov.style.display='none';
+}
+
+/* ─ LOAD FROM GOOGLE SHEETS ─ */
+function loadFromGS(){
+  showLoading('Завантаження даних з хмари...');
+  fetch(GS_URL+'?action=getAll')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(data.error){showT('Помилка: '+data.error,'wn');hideLoading();return;}
+      clients=data.clients.filter(function(c){return !c._deleted&&c._deleted!=='TRUE';}).map(function(c){
+        return Object.assign({},c,{
+          id:parseInt(c.id)||0,
+          in_list:c.in_list==='TRUE'||c.in_list===true||c.in_list==='true',
+          _deleted:false,
+          _email:c._email||c.email||''
+        });
+      });
+      nextId=parseInt(data.nextId)||clients.length+1;
+      hideLoading();
+      initObl();
+      applyCV();
+      restoreSortHeader();
+      ra();
+      showT('Завантажено '+clients.length+' клієнтів','ok');
+    })
+    .catch(function(e){
+      showT('Помилка завантаження з хмари','wn');
+      hideLoading();
+      console.error(e);
+    });
+}
+
+/* ─ SAVE TO GOOGLE SHEETS (via GET chunks) ─ */
+function saveToGS(){
+  saveClientsToGS(clients, function(ok){
+    if(ok) showT('Збережено в Google Sheets ✓','ok');
+    else showT('Помилка збереження','wn');
+  });
+}
+
+function saveClientsToGS(data, callback){
+  var CHUNK=50;
+  var total=data.length;
+  var chunks=[];
+  for(var i=0;i<total;i+=CHUNK) chunks.push(data.slice(i,i+CHUNK));
+  
+  function sendChunk(idx, mode){
+    if(idx>=chunks.length){callback(true);return;}
+    var m=idx===0?mode:'append';
+    var url=GS_URL+'?action=saveChunk&mode='+m+'&data='+encodeURIComponent(JSON.stringify(chunks[idx]));
+    fetch(url)
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.ok) sendChunk(idx+1,'append');
+        else{console.error(d);callback(false);}
+      })
+      .catch(function(e){console.error(e);callback(false);});
+  }
+  sendChunk(0,'replace');
+}
+
+/* ─ MIGRATE OLD DATA ─ */
+var RAW_DATA=[{"oblast":"Житомирська","company":"Малинська Паперова Фабрика","contact":"Микола Миколайович","phone":"(050) 313-49-71","email":"mykola.parubets@wicor.com","notes":".","result":"заявок не маэ, контакти зкинув, буде телефонувати","in_list":true},{"oblast":"Чернігівська","company":"ТОВ «ТАН» (г. Чернигов)","contact":"Анатолий, Денис","phone":"(046) 265-38-75,  (046) 267-21-14","email":"t76tan@gmail.com","notes":".","result":"дал контакты, по мелочи берут, возможно скинет заявку","in_list":false},{"oblast":"Чернігівська","company":"ТОВ «НВП Інкос» (г.Чернигов)","contact":"Віктор Олександрович, Геннадій Михайлович","phone":"(050) 313-09-21","email":"inkos.ua@gmail.com","notes":"будем набирать вдруг будет заявка 01.08","result":"нержавейку берет, круг 80 20х13 берет по 53грн, я ему дал 66грн, есл будет заявка возможно сбросит","in_list":true},{"oblast":"Львівська","company":"ТОВ «Ромтех» (Львовская область, г. Броды)","contact":"Степан Мілентійович","phone":"(050) 431-71-50","email":"romteh@ukr.net","notes":"зателефонує якщо щось зявиться","result":"має бути заявка на круги чугунні, набере","in_list":true},{"oblast":"Херсонська","company":"ТОВ «Зерма Украина» (Каховка)","contact":"Петр Алексеевич","phone":"(050) 418-52-02","email":"sv@tmgreenbull.com.ua","notes":"заявок нету, наберет","result":"контакті есть (я Максим)","in_list":false},{"oblast":"Київська","company":"Завод \"Проммашдеталь\" (Біла-Церква)","contact":"Михаил Федорович (зам), Володимир Іванович (дир)","phone":"(067) 773-77-13, (068) 885-56-88","email":"prommashdetal@ukr.net","notes":"согласовует заказ и работы, наберет, даст ответ по заказу 18.06","result":"всем пользуются понемногу, сбросил коммерческое","in_list":true},{"oblast":"Чернігівська","company":"Завод «Нежинсельмаш»","contact":"Евгения Олеговна (уволилась), Людмила Григорьевна (вместо нее)","phone":"(050) 413-95-12, (095) 282-08-04","email":"info@selmash.com.ua","notes":"заявок нету давно уже","result":"очень тяжело сейчас, стоит предприятие 30.07","in_list":false},{"oblast":"Запорізька","company":"ДСП Агроцентр","contact":"Ярослав (хороший)","phone":"(097) 814-64-32","email":"snab@m-raysnab.zp.ua","notes":"средина июля начнутся ремонтніе работі","result":"набирай переодически, пока основніми работами занимаются, позже будут ремонтніе 23.07","in_list":false},{"oblast":"Полтавська","company":"Пирятинський сирзавод","contact":"Сергей Николаевич","phone":"(099) 372-22-36","email":"","notes":"нет заявок, набирайте","result":"під ремонт не часто","in_list":false},{"oblast":"Івано-франківська","company":"Промприлад (Івано-Франківськ)","contact":"Василь Іванович","phone":"(098) 606-62-32","email":"postavka@prylad.com.ua","notes":"зателефонуй завтра вранці","result":"рахунок полоса 60х12 10Г2, на тендері","in_list":true},{"oblast":"Дніпропетровська","company":"ТОВ Билмакс","contact":"попросить Анастасию(снабж)","phone":"(044)-503-01-05, (067) 562-06-75","email":"snab@bilmax.com.ua","notes":"набери завтра утром 17.07","result":"есть постоянные поставщики берет очень дешево оцинковку на метинвесте","in_list":true},{"oblast":"Одеська","company":"ТОВ Исток (Измаил)","contact":"Виктор Анатолиевич","phone":"(095) 624-08-98","email":"rkz2017@ukr.net","notes":"трубі изготовляют, нержавейка, черній. Зима сезон","result":"полосы, пока заявок нету, наберет сам","in_list":false},{"oblast":"Хмельницька","company":"НВП Адвисмаш (Хмельницький)","contact":"Мария Семеновна","phone":"(038) 270-22-42, (067) 678-03-63","email":"advismash@ukr.net","notes":"нет ничего, не знает когда будет","result":"заказчики есть. На пол ляма металла хочет купить, ждет денег 18.06","in_list":true},{"oblast":"Луцька","company":"ТОВ ДейріКо (м.Луцьк)","contact":"Владимир Ананьевич","phone":"(067) 010-11-91","email":"info@dairyco.com.ua","notes":"червень друга половина","result":"ждет потепления, травень може, набере","in_list":true},{"oblast":"Черкаська","company":"ПП \"АСКОЛЬД-АГРО\" Жашків","contact":"Олександр (снабж)","phone":"(050) 338-51-99","email":"","notes":"бувають заявки, зателефонуэ","result":"под ремонт берут только","in_list":false},{"oblast":"Київська","company":"Пром.компанія \"Авікпром\" (Коцюбинське)","contact":"Наталья","phone":"(044)-332-26-62","email":"avikprom@bigmir.net","notes":"металхолдинг берут, уже 10 лет сотрудничают, не хотят менять поставщиков","result":"круг 170 ст45 30см круг 110ст 40х по ценам не прошли","in_list":false},{"oblast":"Київська","company":"Завод \"Точмаш\" (м. Переяслав-Хмельницький)","contact":"Вячеслав","phone":"(099) 667-41-80, (063) 884-43-89","email":"tochmash.reduktor.ltd@gmail.com","notes":"металхолдинг, еще кто-то","result":"дал заявку на круг 32 ст45 66м, не завышать цену","in_list":true},{"oblast":"Херсонська","company":"Екобіотек-Украина (Херсон)","contact":"Ирина Васильевна","phone":"(050)-494-46-40","email":"snab@ekobiotek-ukraine.com.ua","notes":"затишье, наберет сказала","result":"(Максим)лист 0,5 1х2 304 сталь,  труба 16х1 Л68 (л63).","in_list":false},{"oblast":"Тернопільська","company":"Мікоген-Україна (м.Шумськ,Тернопільська обл.)","contact":"Юрий Федорович","phone":"(067) 350-99-87","email":"","notes":"","result":"поки що не має, контакти є","in_list":false},{"oblast":"Сумська","company":"Укрсанліт (Суми)","contact":"Костянтин Михайлович","phone":"(067)5453520","email":"snabukrsa@ukr.net","notes":"","result":"","in_list":true},{"oblast":"Харківська","company":"ТД \"Домен\" (Харьк. обл)","contact":"Михаил Алексеевич","phone":"(057) 754-34-39, (066) 525-76-58","email":"domen2002@ukr.net","notes":"лист 1мм 65Г","result":"будет вечером либо завтра утром","in_list":true},{"oblast":"Черкаська","company":"ТОВ» ВКП Спектр» (Черкаси)","contact":"Николай (хороший)","phone":"(096) 335-56-49","email":"spektr.ktb@gmail.com","notes":"лист 2,4 МН19 сталь","result":"рулони х/к, 2,2.5,3 08КП по рулону і порізаний штріпс","in_list":true},{"oblast":"Черкаська","company":"ТОВ \"НДП \"Теплолідер\" (м. Монастирище, Черкаська обл.)","contact":"Людмила (хорошая)","phone":"(067) 954-91-49","email":"teplolider@ukr.net","notes":"очень много говорит. хорошо опговорили с ней, о ситуации в стране, делают промішленніе котлі, в молдову поставки делали","result":"дала заявку, лист 1,4,6 , труба б/ш 51х3.5, уголок 25х25х4, счет выставил, контакты скинул, через неделю будет заявка","in_list":true},{"oblast":"Миколаївська","company":"Николаевский завод смазочного и фильтрующего оборудования","contact":"Вера Александровна(нормальная)","phone":"(051) 258-90-81, (098) 424-85-01","email":"osb@nzsfo.com.ua","notes":"закупают ежеквартально много металла, набрать 4,5 июня","result":"бронзу круги 28,45","in_list":false},{"oblast":"Івано-франківська","company":"Бляхар, ООО (Івано-Франківськ)","contact":"Игорь","phone":"(067) 319-82-74","email":"blyakhar.if@gmail.com","notes":"по 10 листов 0,4 , 0,5 430 сталь  оц 45 листов","result":"лист 0,5 оц 45шт, поцікавиться чи буде дешевше по місцю взяти 0,55","in_list":true},{"oblast":"Харківська","company":"Ланс (Харьков)","contact":"Сергей Тимофеевич","phone":"(057) 752-48-86, (096) 806-28-81","email":"lans2005@ukr.net","notes":"смс, коммерческое","result":"нет заявок, сам ждет","in_list":true},{"oblast":"Кіровоградська","company":"ТОВ КИЗ \"Лезо\"","contact":"Елена (снабж)","phone":"(095) 234-06-06","email":"kizlezo9@gmail.com","notes":"нет пока заявок","result":"раз в 2 недели звонить","in_list":false},{"oblast":"Київська","company":"НПП Белоцерковмаз (Біла Церква)","contact":"попросить Сергея Алексадровича (моб его)","phone":"(045) 635-36-01, (097) 577-47-07","email":"bcmaz@bcmaz.com.ua","notes":"сокращение на заводе, пока нету заявок","result":"в отпусках все, раз в неделю на работу ходит, долги есть у предприятия на несколько миллионов, перед поставщиками, тоже отсрочка до 30 дней","in_list":false},{"oblast":"Луцька","company":"Ансер-Украина ЛТД (Луцьк)","contact":"Артем (снабж)","phone":"(033) 276-97-49, (050) 733-31-38","email":"","notes":"нет заявок наберет","result":"под ремонт берут только","in_list":false},{"oblast":"Рівненська","company":"ЗАТ \"Здолбунівський завод пластмасових виробів \"Іскра\"(Рівненська обл.)","contact":"Ольга","phone":"(036) 522-26-03","email":"iskra-zdol@ukr.net","notes":"не має заявок для ремонту беруть","result":"укр, ком предложение скинул","in_list":true},{"oblast":"Житомирська","company":"ООО «АСС-Коростышевская бумажная фабрика» Жит.область","contact":"Светлана Васильевна (снабж)","phone":"(041) 305-21-91, (098) 658-08-21","email":"sveta-kbf@ukr.net","notes":".","result":"есть прайс","in_list":true},{"oblast":"Київська","company":"КТА","contact":"Владимир Владимирович(гл.инж)","phone":"(044) 499-70-63","email":"ingener@llk.com.ua","notes":"оставил свой номер","result":"прайс есть, секретарь, дал им свій номер телефона, свяжутся","in_list":true},{"oblast":"Київська","company":"Завод СБК-Озера Киев (кирпич произв)","contact":"Олег Анатолиевич(снабжение, хороший)","phone":"(067) 542-17-03","email":"o.bondarenko@sbk.com.ua","notes":"профнастил оц, в понедельник 28.05 набрать, директор где-то вышел","result":"директора штурмует, забор будут делать на заводе","in_list":false},{"oblast":"Київська","company":"Стропува-Украина котлы( Киев, Винница)","contact":"Роман (с ним), Евгений (дир інж),Людмила (замена), Татьяна(была хорошая)","phone":"(067) 422-69-04, (067) 219-88-74 Евгения","email":"snab@energenica.com.ua","notes":"скинет на почту заявку, уже посчитал сколько чего надо","result":"лист 1хк, 2, 2.5, 3, 4 цені за тонну, производить котлі будут июнь, июль","in_list":false},{"oblast":"Чернівецька","company":"Чернівецький хімзавод","contact":"Григорій Миколайович(гл.інж)","phone":"(037) 256-08-34","email":"info@himzavod.com.ua","notes":"не маэ поки що заявок","result":"набери осенью, весной, ремонтируют только","in_list":true},{"oblast":"Хмельницька","company":"Завод \"Пром машина\" (Хмельницький)","contact":"Николай Иванович (постач)","phone":"(038) 263-91-84","email":"strommash1986@ukr.net","notes":"берет частенько","result":"о мысцю бере, купую, майже все беруть, заявки не даэ","in_list":true},{"oblast":"Київська","company":"ЮС-Металл Киев","contact":"попросить Вячеслав(снабж)","phone":"(097) 138-13-89","email":"kovka-2005@ukr.net","notes":"(будут заявки, наберет)","result":"Буд Техно Профиль (маленькие обьемы, Стилмен большие)","in_list":true},{"oblast":"Київська","company":"УХЛ-МАШ МЕТАЛЛИЧЕСКАЯ МЕБЕЛЬ","contact":"Александр Валентинович (снабж)","phone":"(044) 528-33-46, (067) 246-40-78","email":"shoffa@uhl-mash.com.ua","notes":"хороший дед","result":"нет заказов, стоит предприятие","in_list":true},{"oblast":"Київська","company":"Генерация Тепла","contact":"Сергей (снабж)","phone":"(044) 333-47-01, (098) 161-47-70, (067) 768-87-88 личный","email":"gt.sater@gmail.com","notes":"скинул почту, скинет заявку","result":"дал заявку на трубы (дохуя труб)","in_list":true},{"oblast":"Київська","company":"Єкоин Киев","contact":"Виталий Михайлович (хороший)","phone":"(050) 628-71-86","email":"pylyp@ekoin.com.ua","notes":"договора есть, но что-то тянут","result":"начало августа","in_list":false},{"oblast":"Київська","company":"МСИ Ворота","contact":"Андрей Иванович","phone":"(067) 442-33-86","email":"msivorota@gmail.com","notes":"контакты, прайсик","result":"труба проф 60х30х2 цена за м2, дал ему 55,35, берет за 54грн в Вишневом, забирает сам","in_list":true},{"oblast":"Полтавська","company":"Решетилівський Маслозавод","contact":"Сергій (новий снабж)","phone":"(095) 295-64-99","email":"chobanu.sd@laureat.com.ua","notes":"счет 1030, шпонка, шпилька, пруток (нж, бронза)","result":"має скинути договір, отсрочка 45 дней","in_list":false},{"oblast":"Київська","company":"ТОВ \"Вторресурси №3\" (Киев)","contact":"Галина Тереньтьевна","phone":"(044) 563-97-76, (093) 875-36-95","email":"vtorresurs3@ua.fm","notes":"метал редко используют","result":"отправил коммерческое на почту отправил смс контакты","in_list":true},{"oblast":"Кіровоградська","company":"Плайтех (Светловодск Кіровоградська обл.)","contact":"Виктор Алексеевич","phone":"(052) 362-79-91","email":"","notes":"пыд ремонт","result":"виробництво стало, розкачали трохи 16.04, літом підуть заявки","in_list":false},{"oblast":"Чернігівська","company":"ТОВ Промсервіс (Чернигов)","contact":"Елена, Алла","phone":"(046) 293-19-91, (097) 966-04-05 личный, не звонить (Елена)","email":"0982010086@ukr.net","notes":"ничего не нужно, все пока","result":"с Германии заказали (надежней и в сроки)","in_list":false},{"oblast":"Київська","company":"Торгівельно-виробнича фірма ГАЛАНТ (Біла Церква)","contact":"Тетяна(хороша)","phone":"(097) 757-75-55","email":"galantdc@gmail.com","notes":"по замовленню беруть","result":"по замовленням, раз на місяц заявки","in_list":true},{"oblast":"Київська","company":"Завод упаковочного обладнання \"Термо пак\" (Біла Церква)","contact":"Карпенко Ирина Леонидовна","phone":"(045) 631-30-12","email":"karpenko@tp-eu.com","notes":"отсрочки, скидки, договор и тп, не вижу смісла","result":"труба нж 304 30х3 24м","in_list":false},{"oblast":"Миколаївська","company":"Бум Вібропрес/Югстройпрес(Николаев)","contact":"Татьяна(снабж), Виктор Васильев (руководитель)","phone":"(051) 248-35-37, (067) 511-35-81, (093) 554-40-93 руководитель","email":"bum.omts@gmail.com","notes":"в отпуске біла, (франция)дала заявку 23.05","result":"взяла на АВ и Гарант Комплект","in_list":false},{"oblast":"Львівська","company":"ПП Ліборський (с. Поздимир,  Радехівського району,  Львівської обл.) червоноград","contact":"Віталій Миронович (директор)","phone":"(068) 735-22-39","email":"liborskij@gmail.com","notes":"балка 36М 5м","result":"світла не маєЮ, в Болгарію їде, сказав йому що відрізав, буде в мене брати","in_list":true},{"oblast":"Черкаська","company":"НПП Механотрон (Черкаси)","contact":"трубку берет технолог, Олексій Борисович (снабж)","phone":"(047) 272-31-35","email":"normafinans@gmail.com","notes":"нет заявок","result":"сезон осень, пока ничего не будет","in_list":false},{"oblast":"Черкаська","company":"ПП Алнат (Черкасы)","contact":"Василь Володимирович","phone":"(067) 470-37-11","email":"alnatinfo@gmail.com","notes":"в понеділок оплачувати буде, дізнатись про доставку","result":"лист 430 2х1250х2500, лист 10 40х13","in_list":true},{"oblast":"Хмельницька","company":"ТОВ\"Укренергомонтаж\" (м.Нетішин, Хмельницька обл.)/ ПФ \"Володар\"","contact":"Микола (на укр, дуже добрий)) Наталя (замість Віктора)","phone":"(067) 363-01-70, (038) 429-05-36, (067) 657-51-17 личный","email":"uem.viktor@gmail.com","notes":"лист 10,12,30,40 бере за 19100 у метинвеста з доставкою (10т)","result":"на откатах сидит, набирать будет, май","in_list":true},{"oblast":"Волинська","company":"Оснастка (Нововолинськ Волинська обл.)","contact":"спитати Тетяну Павлівну","phone":"(097) 571-38-46","email":"terra-s@ukr.net","notes":"вне зоны постоянно","result":"буде з 1.04 на роботі (май)","in_list":false},{"oblast":"Волинська","company":"Волинь-Кальвіс (Ковель)","contact":"Павло","phone":"(095) 260-91-48","email":"pavel.dranchak@gmail.com","notes":"був у відпустці, в середу зателефонуй","result":"заявка на круги 14, 16 ст3пс по 500кг","in_list":true},{"oblast":"Кіровоградська","company":"НВФ Підйомник (Кропивницький)","contact":"Віта","phone":"(095) 813-44-26, (050) 564-72-97","email":"podyomnik2011@gmail.com","notes":"контакти э лист беруть за 16500 на мысцы","result":"беруть у себе дешевше, лист 2 хк, 3гк, дав рахунок, на листи по низьцій ціні","in_list":true},{"oblast":"Вінницька","company":"Птицекомбінат \"Бершадський\" (Вінницька обл.)","contact":"Олександр Васильович","phone":"(067) 999-78-23","email":"ptica@bershad.com.ua","notes":"трубку постоянно не берет","result":"НД НД НД НД НД","in_list":false},{"oblast":"Київська","company":"ТОВ \"Кволісфера\"","contact":"Алена, Виталий","phone":"(067) 400-14-82, (050) 490-00-26","email":"vitaliyyeremiya@deliverygroup.com","notes":"Виталия набирать","result":"листы в основном, в мае могут закрыть металло производство","in_list":true},{"oblast":"Київська","company":"ТОВ \"ДЛС - МЕБЛІ\"","contact":"Олег","phone":"(067) 239-48-01","email":"m.sklad@dls.ua","notes":"осень, зима сезон","result":"трубі тонкостенніе, есть металл, наберет","in_list":true},{"oblast":"Запорізька","company":"ПП \"АРТЕ-Н\"","contact":"попросить Александр Єдуардович, Ярослав Владимирович","phone":"(099) 535-57-07, (061) 701-61-22","email":"artenzp@gmail.com","notes":"нет на месте","result":"","in_list":true},{"oblast":"Закарпатська","company":"ПАТ \"ІЗМЗУ\"","contact":"Ірина Василівна (бере слухавку), Богдан (відділ постачання)","phone":"(031) 442-17-36","email":"izmzu@emitents.net.ua","notes":"зателефонуэ","result":"дав заявку труба 100х100х6 2 по 4метри, на АВ беруть по місцю","in_list":true},{"oblast":"Рівненська","company":"Рембуд (Рівне)","contact":"Нинель Васильевна снабженец","phone":"(044) 563-99-71 (94-44) 067-236-29-97","email":"0672362997@ukr.net","notes":"пока нету заявок, сейчас ремонты в квартирах малярные","result":"нет заявок, номер есть, наберет","in_list":true},{"oblast":"Київська","company":"Мелта Киев","contact":"Александр-главн инженер","phone":"(044) 424-35-05","email":"melta_dd@ukr.net","notes":"никель. электротехническая сталь","result":"у проверенніх берут, контакті есть","in_list":true},{"oblast":"Київська","company":"ТОВ Абра","contact":"Виктория снабженец","phone":"(067) 223-27-16","email":"pr@abra.com.ua","notes":"оцинковка в рукллоне 0,8 ,1 и 1.5 хк Словакия","result":"оцинковку 0,8 берет","in_list":false},{"oblast":"Луганська","company":"Микротерм","contact":"Наталья Александровна снабженец","phone":"(064) 525-22-12, (050) 347-46-20","email":"natahsed76@gmail.com","notes":"шестегранник 30.32","result":"на откатах, предложит цену по какой сделать","in_list":true},{"oblast":"Житомирська","company":"Коростенька виправна колония №71","contact":"Владимир Павлович (берет), Любов Петровна ( снабж). Александр Александрович (дир)","phone":"04142-46-808 (46-908)","email":"kvk71@ukr.net","notes":"уголок, трубы, проволока пружинна 3,3.5,4","result":"в город ездит постоянно","in_list":true},{"oblast":"Київська","company":"Нива-Переяславщины","contact":"Анатолий Федорович-снабженец (укр); Николай Васильевич","phone":"(050) 411-48-85, (050) 441-89-68","email":"info@niva-sa.com.ua","notes":"чер мет по 100 т","result":"разговорил немного, МХ, Гудвил","in_list":true},{"oblast":"Хмельницька","company":"Завод точной механики","contact":"Виктор","phone":"(038) 493-42-73, (098) 008-27-11","email":"","notes":"Круг 100 сталь 60 С2А редкая марка","result":"тендеры только","in_list":false},{"oblast":"Харківська","company":"Вовчанский агрегатный завод","contact":"Николай Васильевич (нач отдела), Александр Сергеевич (снабженец)","phone":"(057) 414-21-04, (057) 414-33-47 этот","email":"","notes":"медь в листах 0.8; бронза. пружинка. сталь 70; нержавейка листы","result":".","in_list":false},{"oblast":"Київська","company":"Киевское металофурнітурне підприємство \" Текстемп\"","contact":"Николай","phone":"(044) 564-66-67","email":"nickhusarow@ukr.net","notes":"на обеде после 13-00 набрать","result":"нд вечно","in_list":true},{"oblast":"Київська","company":"СмартКлиматГруп","contact":"Вадим","phone":"(044) 337-38-03; (067) 320-28-55","email":"vadim@smartclimate.com.ua","notes":".нд постоянно","result":"трубы бесшовные. Сварные","in_list":false},{"oblast":"Київська","company":"Эридон Буд","contact":"Лариса хорошая( не снабжение, но переведет)","phone":"(044) 354-35-66","email":"bud@eridonbud.com","notes":"не туда переводят","result":"на больничном, в мае будет","in_list":true},{"oblast":"Київська","company":"Промгазтехнология","contact":"зам директора, Олександр (снабж)","phone":"(045) 656-70-69, (045) 656-66-11","email":"","notes":"покупают все","result":"заказ вроде как есть но не по нам (не понятный)","in_list":false},{"oblast":"Київська","company":"Росбуд","contact":"Роман ( понос)","phone":"(050) 359-92-65","email":"","notes":"раз в месяц набирай","result":"бросает трубку","in_list":false},{"oblast":"Київська","company":"Блан-Дор","contact":"Елена (хорошая)","phone":"(067) 234-64-07","email":"blan-dor@ukr.net","notes":"подписан у нее, заказов нету","result":"записала контакты","in_list":true},{"oblast":"Київська","company":"Армотек (Киев)","contact":"Богдан","phone":"(044) 501-08-00; (050) 387-72-77","email":"armotecpol@gmail.com","notes":".","result":"арматура 8 мера, бросили трубку дал 17430","in_list":true},{"oblast":"Київська","company":"Складні сплави","contact":"Михаил Васильевич","phone":"(044) 502-60-19; (093) 578-33-42","email":"m.marhaichuk@gmail.com","notes":"осень сезон начало","result":"в июне набери","in_list":true},{"oblast":"Запорізька","company":"МЗАТЗ (мелитополь)","contact":"Бехтер Максим, начальник Татьяна Ивановна","phone":"(067) 610-87-57, (067) 578-92-28","email":"415860mztz@gmail.com","notes":"запустились только только","result":"лист 3х1х2 3т по 37тыс с доставкой берут","in_list":false},{"oblast":"Київська","company":"Житлоінвестбуд (Киев)","contact":"Наталья Владимировна","phone":"(044) 234-74-67","email":"natasha@investbud.com","notes":"контакты дал свои","result":"нет обьектов, нет заявок","in_list":false},{"oblast":"Київська","company":"Примтекс Плюс","contact":"попросить Ярослава","phone":"(044) 462-52-95","email":"snab@primteks.kiev.ua","notes":"записал контакты, ближе к августу","result":"в конце месяца набери, пока нет заявок","in_list":true},{"oblast":"Вінницька","company":"Гніванський завод спецзалізобетону","contact":"Галина бере слухавку, Олександр (постач гарний)","phone":"(043) 553-39-93","email":"szbvmtp@gmail.com","notes":"стоїть завод нічого не робимо в цьому році","result":"проволока 1.6 по 15кг (80кг), зкимось договір, беруть дешевше трошки","in_list":true},{"oblast":"Черкаська","company":"Каменский машиностроительный завод","contact":"Наталья","phone":"(047) 326-14-76","email":"sale@kammash.com","notes":"в Болгарии она с понедельника","result":"кризис, стоит предприятие","in_list":true},{"oblast":"Київська","company":"РЕНесанс трейд груп","contact":"Андрей Александрович(директор)","phone":"(044) 229-14-23, (063) 244-49-64","email":"renindustrial@gmail.com","notes":"метал-холдинг","result":"круги 30-170 ст40х.","in_list":true},{"oblast":"Київська","company":"ВТК Механик","contact":"Сергей Степанович(нормальній)","phone":"(050) 353-52-14; (044) 566-70-11","email":"gliuza@ukr.net","notes":"заказов нету","result":"листы в основном берут МХ поставщик пару, тройку листов","in_list":true},{"oblast":"Чернігівська","company":"ДП \"УкрСіверБуд\"","contact":"Наталья Алексеевна","phone":"(093) 325-01-45","email":"","notes":"дороже 16700 не предлагать с доставкой","result":"арматура 12мера берет по 16700 по месту","in_list":false},{"oblast":"Київська","company":"Сквирский комбинат хлебопродуктов","contact":"раньше был Константин, а сейчас Татьяна","phone":"(045) 685-20-77; (067) 218-17-86","email":"kpu@skviryanka.com.ua","notes":"сброс","result":"нет надобности","in_list":false},{"oblast":"Тернопільська","company":"ТЛТ-К","contact":"Микола","phone":"(097) 428-44-71","email":"","notes":"чорний металлопрокат, раз в місяць по замволенню","result":"после праздников, нет заявок","in_list":false},{"oblast":"Київська","company":"Инек ЛТД","contact":"Марьяна","phone":"(044) 272-41-69; (098) 296-01-38","email":"0982960138@ukr.net","notes":"молодая девушка","result":"трубы берут, с начала месяца набирать","in_list":false},{"oblast":"Київська","company":"ИБК Центробуд","contact":"попросити Анатолий Васильевич","phone":"(044) 207-11-21, (067) 242-82-06","email":"mtz3@ibkcentrobud.com.ua","notes":"замовленнь не має","result":"заявок нету. Обьекты есть. Но они не снабжают, заказчики все закупают","in_list":true},{"oblast":"Вінницька","company":"Теплоэнергоресурс","contact":"Сергей Иванович снабженец-командировочный","phone":"(050) 313-08-73; (068) 706-66-04","email":"s3902@i.ua","notes":"контакты сбросить","result":"трубы профильные, обманівали не раз, не хочет, но с ним приятно говорить, спокойный, на контакт идет","in_list":true},{"oblast":"Київська","company":"Ренал Киев ФИРМА","contact":"Григорий Павлович (директор), Юля Григорьевна была","phone":"(044) 209-63-86, (067) 502-77-91","email":"pp@renal.kiev.ua","notes":"листы 2; 3; 1.5","result":"лист 4 3ПС5, 1500х6000 10Т, по цене прошли, но МХ дает отстрочку на 40 дней","in_list":false},{"oblast":"Київська","company":"Технология-бизнес","contact":"Елена","phone":"(044) 497-70-73; (095) 068-47-51, (096) 303-81-64 звонить на моб","email":"echibisheva@gmail.com","notes":"на следующей неделе может будет что-то","result":"труба 10х2,5(3) 2м","in_list":false},{"oblast":"Черкаська","company":"ПП Надія","contact":"Елена,  Надежда Сергеевна (моб)","phone":"(050) 313-40-83, Надежда Сергеевна, (047) 254-06-22","email":"0632964024@ukr.net","notes":"раз в недельку звонить","result":"наберет сказала будет что-то","in_list":true},{"oblast":"Чернігівська","company":"Техно Т","contact":"Виктор Петрович, Александр Сергеевич (менеджер по снабжению)","phone":"(046) 313-19-06, (046) 313-16-86, (096) 288-85-04","email":"tehno-t@i.ua","notes":"Александр норм вроде, в понедельник буду на работе","result":"чорний металлопрокат (листи, труби)","in_list":true},{"oblast":"Чернігівська","company":"ТОВ Зотік","contact":"Елена","phone":"(046) 269-70-68, (050) 465-40-29","email":"pinchuk1984elena@gmail.com","notes":"заявка обломалась, едет в отпуск, будет с 18-го","result":"","in_list":false},{"oblast":"Київська","company":"Киев-В","contact":"Лариса Ивановна","phone":"(044) 244-91-27","email":"zl@kiy-v.pro","notes":"нерж 201 1(0.8)*1250*2500 шлифпленка","result":"ничего не надо, нет заявок","in_list":true},{"oblast":"Київська","company":"Профит-2","contact":"Ніна Архипівна","phone":"(044) 503-02-12","email":"ninaks@ukr.net","notes":"через месяц","result":"ничего не нужно, наберет","in_list":true},{"oblast":"Київська","company":"СлавБудТранс","contact":".","phone":".","email":"slavbudtrans@ua.fm","notes":"решение принимает директор","result":"позвонить на 1й номер, узнать кто занимается закупками","in_list":true},{"oblast":"Київська","company":"АТ Элмиз","contact":"Алексей(есть еще Юрий)","phone":"(044) 566-95-44","email":"sopds@elmiz.com.ua","notes":"раз в 2-3 недели","result":"Пруток С300, 03Х18К9М5Т","in_list":false},{"oblast":"Луганська","company":"ООО «Вико-Украина»","contact":"Владимир","phone":"(050) 478-25-46","email":"omtc@wiko.com.ua","notes":"вечное НД","result":"","in_list":true},{"oblast":"Київська","company":"Юрис ЛТД (Барышевка)","contact":"попросить Валеру","phone":"(044) 223-80-40","email":"youris@youris.com.ua","notes":"в августе нужен будет металл, закупают на сезон металлопрокат","result":"по 500кг позиций берут, мет инвест, ав-мет, Сталевий світ,отсрочка пару дней, берут лист ХК, 08,1,1.2 , оц 1,1.2,0.7 , 2,5 (хк) профильная труба 80х40х2, 40х60х2, 30х30Х1,5(2) 40х20х2, 30х10х1,5(2).","in_list":true},{"oblast":"Черкаська","company":"ВАТ Уманський завод \"Мегомметр\"","contact":"Дмитрий Сергеевич","phone":"(047) 443-41-15","email":"megommetrzbut@ukr.net","notes":"ласково послал","result":"Контакты якобы есть","in_list":true},{"oblast":"Кіровоградська","company":"ТОВ Евростенд Групп","contact":"Александр","phone":"(050) 789-43-84","email":"office@evrostand.com.ua","notes":"разговаривает","result":"листы оц 0,8 широкий расскрой, берет десятками тонн","in_list":false},{"oblast":"Запорізька","company":"Стальные двери Запорожья-ТМ","contact":".","phone":"(061) 289 27 61, (050) 340-39-50","email":"","notes":"","result":"","in_list":false},{"oblast":"Київська","company":"ТОВ Венкор Трейдинг (Боярка)","contact":"Денис (болтливый, хороший) начальник отдела","phone":"(067) 443-87-46","email":"zakharov@kabina.net.ua","notes":"на тренинг ходил Охрана труда, 5С система, тайм менеджмент","result":"в понедельник набери часиков в 12-00 на АВ берут","in_list":false},{"oblast":"Кіровоградська","company":"ТОВ «Ю.Т.К.»","contact":"Олег Игнатенко (второй номер)","phone":"(050) 311-55-13, (097) 552-22-45","email":"zam@utk.kiev.ua","notes":".","result":"","in_list":false},{"oblast":"Київська","company":"ТОВ \"ЭлитБилдГруп\" (Вышгород)","contact":"Оксана  (очень приятная)","phone":"(067) 670-20-50, (063) 571-75-37","email":"cvc3@i.ua","notes":"записала контакты, заявки частенько бывают, будет контактировать","result":"профнастил дал цену 87грн, на АВ Метале берут(рядом)","in_list":false},{"oblast":"Харківська","company":"ТОВ \"РЕАЛ-СТРОЙ ГРУПП\"","contact":"","phone":"(063) 840-66-66, (095) 053-56-66","email":"info@real-sg.com.ua","notes":".","result":"","in_list":false},{"oblast":"Дніпропетровська","company":"ТОВ AMF","contact":"","phone":"(056) 790-15-00, (067) 223-11-22","email":"info@amf.com.ua","notes":".","result":"","in_list":false},{"oblast":"Львівська","company":"ТК Стандарт, ТЗОВ Будспецстандарт","contact":"Оля","phone":"(067) 332-15-43","email":"super1@tkstandart.com.ua","notes":"через тижня 2 буде велике замовлення, зараз документальны питання, зателефонуэ обовязково","result":"труби, листи, труба 76х4 - 21200грн, лист 4,5 1","in_list":false},{"oblast":"Вінницька","company":"ЧП Пружина (козятин)","contact":"Олег Анатолиевич(снабжение)","phone":"(097) 509-27-49","email":"prughina@ukr.net","notes":"проволоку берут (0,5мм- 8мм)","result":"","in_list":true},{"oblast":"Дніпропетровська","company":"RKDOM UKRAINE","contact":"Александр","phone":"(096) 108-11-08. (099) 544-88-32","email":"mail@rkdom.dp.ua","notes":"строительство домов, будки охраны, мафы","result":"труба 40х40х1,8, дал за 19600","in_list":false},{"oblast":"Київська","company":"KIEVMAF.COM.UA","contact":"Андрей","phone":"(068) 381-88-88","email":"1maf@ukr.net","notes":"строительство малых сооружений (трубы профильные, листы)","result":"пару дней наберите, не дали заявку","in_list":false},{"oblast":"Київська","company":"ТОВ \"ДАК\" металлопластиковые окна","contact":"Станислав снабж (хороший)","phone":"(050) 516-41-59","email":"0505164159@ukr.net","notes":"дал в производство","result":"уголок алюминий, лист 0.9 оц в рале","in_list":true},{"oblast":"Полтавська","company":"ТОВ \"Авто моторная компания\"","contact":"Виталий Юрьевич (козел))","phone":"(066) 483-80-12, (099) 310 71 63","email":"","notes":"по мелочи берет, бросил трубку","result":"не користуються взагалі","in_list":false},{"oblast":"Харківська","company":"Альянс Строй-Груп","contact":"Владислав (очень хороший)","phone":"(098) 938-06-11","email":"info@alyans-sg.com.ua","notes":"(с днепра возят вроде)","result":"заявка 908 на профильніе трубі, у него постоянній поставщик есть, цену хорошую даем (не завішать сильно, заявки в вайбере будет сбрасівать)","in_list":false},{"oblast":"Київська","company":"ФОП Тинякова","contact":"Владимир Александрович","phone":"(067) 408-56-85; (099) 646-48-72","email":"","notes":"всех распустил, нет работи, номер есть","result":"","in_list":false},{"oblast":"Київська","company":"ООО «Группа Компаний «Альфа и Омега»","contact":"Александр (098,063)","phone":"(044) 529-19-95, (098) 972-32-88, (063) 380-18-59","email":"office@alfa-omega.com.ua","notes":"нержавейку","result":"смс ему дал на номер","in_list":true},{"oblast":"Хмельницька","company":"ПП Поліщук Олександр Васильович (Шарм 07)","contact":"Олександр Васильович (хороший)","phone":"(098) 231-27-09","email":"","notes":"будет набирать сказал, номер записан","result":"ще є метал","in_list":false},{"oblast":"Вінницька","company":"ВАТ «Брацлав»","contact":"Богдан Федорович (постач)","phone":"(096) 615-09-56, (043) 315-19-63","email":"vmtsbratslav@gmail.com","notes":"по листу думають","result":"середа 10.07","in_list":true},{"oblast":"Кіровоградська","company":"МРК Агро-тема","contact":"Олександр Анатолійович","phone":"(067) 450-85-00","email":"","notes":"отмороженый","result":"маленкі обєми по металлу, зателефоную якщо буде","in_list":false},{"oblast":"Запорізька","company":"Група компаній «Піщемаш»","contact":"Наталья, попросить Роман Александровича","phone":"(061) 943-44-99","email":"roman-k74@ukr.net","notes":"морозит Наташа","result":"пару месяцев не нужно будет металла","in_list":true},{"oblast":"Полтавська","company":"ТОВ Елмаш","contact":"Світлана Данилівна","phone":"(053) 462-65-01","email":"info@elevatorov.net.ua","notes":".","result":"в-во стоїть, немає замовлень вже давно","in_list":true},{"oblast":"Харківська","company":"ТОВ «Ортус»","contact":"Вера Николаевна или (Ольга), Вячеслав Олексійович","phone":"(067) 737-97-42 (Веры Николаевны), (057) 754-32-94  Вячеслава Алексеевича (на этот)","email":"tpp107@mail.ru","notes":"они на тендерах, если выигрывают, есть заявки, звонить раз в 2 недели.","result":"раз в 2 недели","in_list":false},{"oblast":"Київська","company":"Ело Пак","contact":"Ігор (хороший)","phone":"(044) 408-70-58","email":"snab@elo-pak.com","notes":"дав на пошту контакти, прайс","result":"э замовлення","in_list":false},{"oblast":"Рівненська","company":"ПАТ \"ДУБНОМОЛОКО\"","contact":"Сергій Володимирович інженер","phone":"(097) 085-98-13","email":"k.s.v.3@ukr.net","notes":"в понедылок може буде щось выдомо, неа смарттендеры","result":"тендери будуть на наступному тижны","in_list":true},{"oblast":"Київська","company":"Броварской з-д металоконструкций","contact":"Владимир","phone":"(044) 543-97-58","email":"info@bzmk.com.ua","notes":"рідко заявки","result":"під замовлення, через місяць","in_list":false},{"oblast":"Київська","company":"Металопромышленный центр","contact":"Виктория","phone":"(095) 295-90-95, (095) 295-00-95 Олег Николаевич","email":"mpckiev@gmail.com","notes":"зателефонуй завтра вранці","result":"не закупают","in_list":true},{"oblast":"Київська","company":"ПП Ролс Ролс   (Белая Церковь)","contact":"Дмитрий (директор вроде)","phone":"098-400-13-77 Дима,  097-740-89-19 Алена","email":"rolls_rolls@ukr.net","notes":".","result":"труба проф 25.25х1,2 360м","in_list":true},{"oblast":"Київська","company":"Укртехнофудз","contact":"Ирина (попросить)","phone":"(044) 585-17-01","email":"snab@utf.ua","notes":"пишите ей на почту","result":"Нержавейка литс. Труба","in_list":false},{"oblast":"Львівська","company":"АГРОКАП, ТОВ З ІІ","contact":"Юрій","phone":"(050) 371-91-90","email":"agrocap@ukr.net","notes":"1500тонн зможете забезпечити, везіть","result":"","in_list":true},{"oblast":"Херсонська","company":"ХЛЕБОКОМБИНАТ СКАДОВСКОГО РАЙПОТРЕБСОЮЗА","contact":"Дмитрий Андреевич","phone":"063-640-29-46","email":"","notes":"трубі тянуть будут, нужны для газа","result":"проєкт еще не готовій, ждут проекта","in_list":false},{"oblast":"Вінницька","company":"ДЕРКАЧ ЧП тм\"Автопристрій»","contact":"Аліна (секретар), Наталя Федорівна (директор)","phone":"(098) 079-53-77","email":"autoprystryj@i.ua","notes":"був Ігор, дав номер телефону дівчат","result":"","in_list":false},{"oblast":"Чернігівська","company":"РА АГРО","contact":"Сергей","phone":"(046) 296-81-07","email":"office@raagro.com","notes":"заказыв не маэ, на майбутнэ","result":"скинул парйс и контакты","in_list":false},{"oblast":"Київська","company":"ТОВ Азби","contact":"Иван Федорович","phone":"(095) 270-52-18","email":"","notes":"з вересня","result":"набери в пятницу 05.07","in_list":false},{"oblast":"Харківська","company":"Олегия, ЧП","contact":"серетарь берет( не пускает)Олег Леонидович - директор","phone":"(098) 930-74-54","email":"info@olegiya.com.ua","notes":".","result":"","in_list":true},{"oblast":"Київська","company":"Аэросила-плюс, ЧП","contact":"Алексей Игоревич (зам директора, хороший)","phone":"(097) 917-06-21","email":"","notes":"берут частенько, зам директор Общительный, знает Амари, МХ, Линоква, АВ, МД, заявки не собирает под обычные позиции","result":"","in_list":false},{"oblast":"Одеська","company":"МЕТАЛЛУМ НПФ","contact":"Алексей","phone":"(048) 706-26-73; (097) 743-69-84","email":"metallum_office@ukr.net","notes":"не очень удобно біло говорить","result":"звони раз в месяц","in_list":true},{"oblast":"Київська","company":"ЦукорЭнергоМонтаж","contact":"Николай Владимирович (хороший)","phone":"(050) 695-76-28","email":"","notes":"в командировке с понедельника 01.07","result":"раз в месяц","in_list":false},{"oblast":"Донецька","company":"Новокраматорский машиностроительный завод","contact":"Владимир Иванович - начальник отд, Геннадий Леонидович - зам","phone":"06264-7-88-13 (14)","email":"","notes":"на сайте закупки","result":"на сайт заходить","in_list":false},{"oblast":"Івано-франківська","company":"КАЛУШСТАЛЬБУД","contact":"Олег , Петро (йому телефонувати)","phone":"(097) 460-56-50 ,(098) 963-09-75","email":"ladanyak-kalush@meta.ua","notes":".","result":"середина липня сказав, дзвоню на початку","in_list":true},{"oblast":"Харківська","company":"Промавтоматика","contact":"Елена (хорошая)","phone":"(057) 760-15-02(03), (066) 057-48-06","email":"","notes":".","result":"только под ремонт, конаткті должні біть у нее","in_list":false},{"oblast":"Вінницька","company":"Сигма","contact":"Константин Николаевич","phone":"(050) 461-50-01","email":"sigma.market1@gmail.com","notes":"в гості давно збирається заїхати","result":"УГМК, КОМЕКС, ТРІАДА, гарний говорливий","in_list":true},{"oblast":"Тернопільська","company":"Будинвест","contact":"Петро Висильевич - директор","phone":"(097) 440-03-10","email":"","notes":"","result":"","in_list":false},{"oblast":"Київська","company":"КЛОНДАЙК ГРУПП, ПЛАСТ65 , Мережа буд компания","contact":"Валерий Владимирович","phone":"(066) 355-24-59,  (063) 812-49-19","email":"plast65@ukr.net","notes":"Швеллер от 20-30 нужен, дал ему цену , пару тонн нужно будет с доставкой печерск, Альфа Метал, Вартис","result":"21800 - 30П швеллер, 24000 полоса от размера, счет с доставкой","in_list":true},{"oblast":"Тернопільська","company":"Коржевский специализированный горнично-дробильный карьер","contact":"Иван Степанович (хороший)","phone":"(067) 382-92-10","email":"","notes":"под будівництво, ремонт","result":"через місяць, дав йому контакти","in_list":false},{"oblast":"Тернопільська","company":"Карьер Новоселка","contact":"попросити ВІктора Михайловича, Андрій (постач) (067) 350-49-09 (моб його)","phone":"(035) 433-60-82, (067) 350-49-09","email":"kar.nov@ukr.net","notes":"дав заявку, передав директорам на узгодження, в липны буде выдповыдь, зателефонуэ","result":"уставные отправил, договор юристам отдал, свяжется 11,12 числа даст ответ, цена сошлись","in_list":true},{"oblast":"Тернопільська","company":"Плотицкая агропромтехника","contact":"Андрей , директор Василь Ярославович","phone":"(035) 229-66-60","email":"","notes":"","result":"","in_list":false},{"oblast":"Тернопільська","company":"Ремпобуттехніка","contact":"Олександр","phone":"(035) 228-39-64","email":"123@integral.te.ua","notes":"не часто замовлення","result":"","in_list":true},{"oblast":"Тернопільська","company":"Спецавтоінвест","contact":"Віталій Мирославович","phone":"(067) 353-15-41","email":"vitaliktr1992@ukr.net","notes":".","result":"","in_list":true},{"oblast":"Харківська","company":"Росс","contact":"Олег Станиславович","phone":"(095) 455-51-27","email":"","notes":"","result":"","in_list":false},{"oblast":"Хмельницька","company":"Агромоторсервис","contact":"Василь (контакты)","phone":"(038) 543-22-69, (067) 382-37-17","email":"sale@ams.ua","notes":"дав свый номер, контакти зкинув","result":"під замовлення","in_list":true},{"oblast":"Тернопільська","company":"Альфа-Газпромкомплект","contact":"номер директора, Ігор Степанович був раніше","phone":"(035) 225-29-82","email":"","notes":"","result":"","in_list":false},{"oblast":"Київська","company":"ЧП \"Гипрон\"","contact":"Катерина","phone":"(098) 558-67-02, (099) 767-13-91, (044) 223-83-35","email":"0997671391g@gmail.com","notes":"закупаються на місяць","result":"","in_list":true},{"oblast":"Полтавська","company":"KMZ Industries","contact":"Оксана","phone":"(053) 462-27-35, (050) 309 75 87","email":"o.golovko@kmzindustries.ua","notes":"балка 20б1 09г2с","result":"інвентаризація була, тендерна основа, збиратиме рахунки, ціну надати занижену","in_list":false},{"oblast":"Вінницька","company":"Максиэкобуд","contact":"Микола Миколайович","phone":"(068) 852-56-72","email":"maksiekobud@gmail.com","notes":"не має заявок, а цьому місяці не буде","result":"","in_list":true},{"oblast":"Харківська","company":"М-СМК","contact":"Василий Николаевич","phone":"(057) 714-60-29; (050) 303-90-74","email":"","notes":"пока нету","result":"","in_list":false},{"oblast":"Черкаська","company":"Огрант","contact":"Владислав","phone":"(047) 264-45-92","email":"info@ogrant.com.ua","notes":"у відрядженні","result":"не используют","in_list":true},{"oblast":"Івано-франківська","company":"Завод - Техмаш","contact":"попросити Любомира (приємний)","phone":"(034) 727-34-71, (050) 430-09-95","email":"zavod_tehmash@ukr.net","notes":"тижня через 2 зателефонуй","result":"","in_list":false},{"oblast":"Черкаська","company":"Укртрансдизель","contact":"Ігор Васильович( нормальний)","phone":"(096) 536-08-13","email":"","notes":"під ремонт беруть, через місяць зателефонуй","result":"","in_list":false},{"oblast":"Черкаська","company":"Старобабанівська виправна колонія (№ 92)","contact":"Дзюман Олександр Володимирович","phone":"(047) 443-97-17","email":"","notes":"","result":"","in_list":false},{"oblast":"Черкаська","company":"МАЛО- БУЗУКІВСЬКИЙ ГРАНІТНИЙ КАР'ЄР","contact":"Николай Николаевич","phone":"(067) 823-30-07","email":"380678233007@ukr.net","notes":".","result":"","in_list":true},{"oblast":"Черкаська","company":"Монастырищенский машиностроительный завод (Монастырищенский котельный завод)","contact":"Володимир Сергійович","phone":"(097) 627-97-52","email":"","notes":"","result":"","in_list":false},{"oblast":"Київська","company":"Большевик ПАО «НПП","contact":"Василь Миколайович( дуже добрий)","phone":"(044) 456-83-79, (068) 365-70-50 особистий","email":"snab.bolshevik@gmail.com","notes":"Зам директора бере на НАША СТАЛЬ","result":"зарплатню затримують, заявок дуже мало","in_list":true},{"oblast":"Черкаська","company":"ЕТУАЛЬ-МЕТАЛ, ТОВ","contact":"Юрий Петрович - директор","phone":"(050) 558-44-37","email":"","notes":"","result":"","in_list":false},{"oblast":"Черкаська","company":"ШРАМКІВСЬКИЙ ЦЕГЕЛЬНИЙ ЗАВОД, ТОВ","contact":"Владимир Олегович - гл инженер от Ивана Васильевича","phone":"097-673-16-47","email":"","notes":"","result":"майже не використовують","in_list":false},{"oblast":"Черкаська","company":"Цеглабуд","contact":"Анатолий Миколайович","phone":"(047) 263-17-96","email":"tseglabud@gmail.com","notes":"работают только по Черкассам с АВ, но берут круги по 45 и 40х. Стоит звонить.","result":"біза по вул Смілянська","in_list":false},{"oblast":"Одеська","company":"Велес Агро","contact":"Наталья Николаевна","phone":"(048) 716 14 26, (050) 081 11 65, (067) 523 02 20","email":"n.homenko@velesagro.com","notes":"очень много берет металла, хочет в долг","result":"дала заявку на лист 16 22тонні","in_list":false},{"oblast":"Миколаївська","company":"Кворум\" Топливная компания","contact":"Андрей Валериевич (не работает уже, тех директор был)","phone":"066-374-89-47","email":"stroyka@kvorum.mk.ua","notes":".","result":"","in_list":true},{"oblast":"Харківська","company":"Интек ТОВ","contact":"Светлана","phone":"(057) 701-40-89, (094) 853-59-50, (067) 625-56-53","email":"sk@intek.co.ua","notes":"контакты записала, наберет меня если нужно будет","result":"","in_list":true},{"oblast":"Запорізька","company":"Запорожтрансформатор","contact":"Александр( нормальній)","phone":"(061) 270-33-24,  (050) 487-87-97","email":"","notes":"черній листі, уголки, швеллері","result":"","in_list":false},{"oblast":"Хмельницька","company":"Вектор-М","contact":"Сергей Сергеевич","phone":"(038) 275-30-35; (067) 354-37-38","email":"vector-m@inbox.ru","notes":"працює з Комексом","result":"арматуру бере від 10-12","in_list":false},{"oblast":"Кіровоградська","company":"СЗМК (Светловодск)","contact":"Светлана Алексеевна","phone":"(052) 362-07-54; (052) 362-17-63; (052) 369-12-29","email":"","notes":".","result":"","in_list":false},{"oblast":"Київська","company":"KESZ в Украине (Киев)","contact":"Михаил, Олег","phone":"(063) 588-75-80; 537-09-12 Олег","email":"storozhukm@kesz.ua","notes":"слішал о нас, отсрочка, обьемі большие, знает много металлобаз","result":"","in_list":false},{"oblast":"Київська","company":"ЄВРО-РЕКОНСТРУКЦІЯ","contact":"Головний інженер: Василь Семенович","phone":"(044) 291-08-07","email":"kanc@euro.tec4.kiev.ua","notes":".","result":"","in_list":false},{"oblast":"Київська","company":"Интерком","contact":"попросить Оксана Хруставка (Мария біла)","phone":"(044) 206-10-10, (067) 620-22-25 дала свой номер","email":"info@intercom.in.ua","notes":"помнит, бассейны, контакты есть записаны","result":"в вайбере инфо есть (арматура проволока)","in_list":true},{"oblast":"Херсон, но работают по всей Укр, в основном Киев","company":"Swimpool Сервис","contact":"Михаил Алексеевич","phone":"(095) 524-00-51","email":"","notes":".","result":".","in_list":false},{"oblast":"Херсон","company":"Специализированная механизированная колонна № 23","contact":"Дмитрий","phone":"(067) 385-74-84","email":"","notes":"нет ничего пока что, звони периодически","result":"","in_list":false},{"oblast":"Київська","company":"Стил Центр","contact":"Николай (нормальный)","phone":"(044) 227 3 277, (067) 777-06-07","email":"0892400@gmail.com","notes":"нормальный, сейчас другие работы, а так используют, будет звонить, контакты ему сбролсил","result":".","in_list":true},{"oblast":"Дніпропетровська","company":"Електор","contact":"Роман (гарний)","phone":"(096) 292-90-15","email":"","notes":"дав смс контакти,","result":"рідко користуються, 200-300кг беруть","in_list":false},{"oblast":"Київська","company":"Ламинар-Украина","contact":"Виктор","phone":"(044) 492-37-56","email":"info@laminar.com.ua","notes":"на почту скинул информацию, обманули недавно УкрПрофСталь","result":"","in_list":false},{"oblast":"Київська","company":"ВК IНОКС ТАЙМ","contact":"Александр- собственник (хороший)","phone":"(067) 999-67-27","email":"9996727@gmail.com","notes":"на сумму не смотрю, каждому нужно заработать","result":"часто заявки, берут у постояльщиков, на счета не смотрит, если что-то не найдет, будет звонить","in_list":true},{"oblast":"Харківська","company":"Литпол-Украина","contact":"Генадий Иванович( адекватный)","phone":"(050) 308-56-04","email":"litpolsnab@ukr.net","notes":"листовой металлопрокат, постоянно берут, большими обьемами, Метинвест поставщик","result":"Лист х,к 0,5 0,6 0,7 , берут машинами по 20т","in_list":true},{"oblast":"Київська","company":"Билит","contact":"Петр Никитович","phone":"(044) 276-13-85","email":"","notes":".","result":".","in_list":false},{"oblast":"Черкаська","company":"ЗОЛОТОНОШСКИЙ МАШИНОСТРОИТЕЛЬНЫЙ ЗАВОД ИМ.ЛЕПСЕ ПАО","contact":"Сергей или Лилия Викторовна","phone":"(047) 375-30-34","email":"","notes":".","result":".","in_list":false},{"oblast":"Сумська","company":"ТРОСТЯНЕЦКИЙ МАШИНОСТРОИТЕЛЬНЫЙ ЗАВОД ОАО","contact":"Юля Михайловна","phone":"(054) 585-17-53","email":"","notes":"лист 3, берет по 17625 на комэксе","result":".","in_list":false},{"oblast":"Дніпропетровська","company":"ПРОММАШ","contact":"Юрий Андреевич - нач производства (вроде нормальній)","phone":"(067) 565-27-55","email":"","notes":"арматура 20 мера 16800 на виканте, 17150 дал, бросил трубку","result":"бросил трубку","in_list":false},{"oblast":"Черкаська","company":"Огрант ЧПКП","contact":"Сергей Иванович (раньше біл)","phone":"(047) 238-58-11\n(098) 761-74-57","email":"0472385811@ukr.net","notes":"по черкасам берут, все устраивает","result":".","in_list":true},{"oblast":"Харьковская","company":"Завод элеваторного оборудования \"СОКОЛ","contact":"соеденить Наталья Валентиновна","phone":"(057) 714-00-97","email":"","notes":"в отпуске, с 24.06 будет","result":"вы с Киева, не звоните. (набрать с мобильного","in_list":false},{"oblast":"Полтавська","company":"Лубнымаш","contact":"попросить Евгений Анатольевич","phone":"(053) 617-11-53","email":"","notes":"нач следующего месяца","result":".","in_list":false},{"oblast":"Дніпропетровська","company":"Днепропетровский стрелочный завод","contact":"Татьяна Юрьевна","phone":"(056) 794-18-54","email":"tatiana.mamuta@dnsz.ua","notes":".","result":".","in_list":false},{"oblast":"Черкаська","company":"Укртрансдизель","contact":"Игорь Васильевич","phone":"(096) 536-08-13","email":"","notes":"раз в 3 місяці, під ремонт беруть","result":".","in_list":false},{"oblast":"Черкаська","company":"Укрсейф","contact":"Вячеслав (директор)","phone":"(050) 313-71-04","email":"kievkronos@gmail.com","notes":"отправила счет на листы 0,7 и 0,8 холодные. счет на нержавейку 03,08","result":".","in_list":true},{"oblast":"Полтавська","company":"НАФТОБІЗНЕС ТРЕЙД","contact":"Сергей","phone":"(050) 401-27-01","email":"4012701@gmail.com","notes":"Проф.труба, уголок,швеллер,труба цільнотянута.","result":"пока вообще ничего не берут. Звоните.","in_list":true},{"oblast":"Київська","company":"Аспар","contact":"Дарья (офіс менеджер, тоже снабжением занимается), Владимир (директор, псих)","phone":"(095) 258-07-68 (Даша), (067) 231-08-52 Владимир","email":"aspar.office@gmail.com","notes":"бросаю коммерческое, прайс","result":".","in_list":true},{"oblast":"Київська","company":"Winnerstroy","contact":"Евгений","phone":"(050) 464-63-63","email":"winstroi@ukr.net","notes":"сбросил презу,отправ ком пред","result":"в коммандировке со след недели","in_list":true},{"oblast":"Київська","company":"Дослідний зд харчового оснащення","contact":"Михаил Михайлович","phone":"(097) 389-49-91","email":"dzxo2018@ykr.net","notes":"нержавейка 127ст 6","result":"с осени звони","in_list":false},{"oblast":"Миколаївська","company":"АгроТех М","contact":"Виктор(лояльный)","phone":"(095) 137-31-94","email":"agrotehm2018@gmail.com","notes":"заинтересовался б/у металлом","result":"заявок не маэ","in_list":true},{"oblast":"Київська","company":"КОМФОРТХОЛОД","contact":"Анатлоий, Вадим","phone":"(067) 467-18-72 Анатолий; (067) 402-82-62 Вадим (ему звонить","email":"comfortkholod@ukr.net","notes":"Вадим идет на контакт, нормлаьній, берут под ремонт в последнее время","result":"","in_list":true},{"oblast":"Київська","company":"ГК ІСК Груп","contact":"Петр Анатолиевич, есть Игорь (по металлу)","phone":"(044) 331-28-16","email":"vmtp1@ick.ua","notes":"Петрр, хороший, набери в вторник поговорим","result":"квадрат 140, лист 150 ст40х","in_list":true},{"oblast":"Не вказано","company":"ПАТ \"ЗАПОРІЖСКЛОФЛЮС\"","contact":"(061) 239-70-67, 79","phone":"","email":"","notes":"12.06 НД","result":"","in_list":false},{"oblast":"Житомирська","company":"ПРАТ \"ЖИТОМИРЛЬОН\" Житомир","contact":"Владимир Иванович","phone":"(098) 781-58-88","email":"zhitomirljon@gmail.com","notes":"житомир","result":"дал заявку еа профильніе трубы, листы,","in_list":true},{"oblast":"Не вказано","company":"ПРАТ \"ЧЕРКАСЬКЕ ПИВО\"","contact":"Олександр (096) 050-96-32","phone":"","email":"","notes":"металлом занимается инженер, перенаправит ему мои контакті, свяжется","result":"","in_list":false},{"oblast":"Токмак Запорож обл","company":"Саковский ВВ ФОП","contact":"Владимир Васильевич( очень хороший)","phone":"(067) 613 69 85","email":"26saco26@gmail.com","notes":"одни разговоры с заказчиками, заказов нету","result":"круг 320 ст45 или 40х","in_list":false},{"oblast":"Ромны/Сумы","company":"ТехноБиоЕнергоСервис","contact":"Максим","phone":"067 540 32 83","email":"tms2008@ukr.net","notes":"калибр","result":"доставка деливери№1 Ромны/скоро будет готова заявка/скинул крупную крги-листы/еще одна большая аиси304-310","in_list":false},{"oblast":"Не вказано","company":"ПЕТ Технолоджис","contact":"Татьяна Мирвода","phone":"067 462 8342","email":"t.mirvoda@pet-eu.com","notes":"калибр, нж","result":"с апреля/все мои контакты записаны/раб с мх с отср, но идет на контакт, надо чтото предлагать","in_list":true},{"oblast":"Киев/Автозаводская","company":"КМР-технология","contact":"Андрей, директор/мудак","phone":"067 538 60 60","email":"info@kmp-technology.com.ua","notes":"круг20 ст45 5т в мес/хочет подьехать","result":"производят детали для сх техники, выходят на обьем 1,8т в неделю/мороз, затем вышел на связь, сломался станок/исправили, в пон","in_list":false},{"oblast":"Київська","company":"Интератоминструмент","contact":"Николай Иванович","phone":"050 219 77 86","email":"info@iai.com.ua","notes":"нж304 круг, труба","result":"еще считают, занят, с понед","in_list":false},{"oblast":"Київська","company":"НИП ТОВ Екофлок","contact":"Сергей","phone":"050 411 97 82","email":"ecoflock@ukr.net","notes":".","result":"вернется с коммандировки в четверг/пока редко с металлом, коммерч","in_list":false},{"oblast":"Киев, Академ","company":"Плазма-Мастер","contact":"","phone":"537 31 44","email":"nn@plasma-master.com","notes":"все","result":"черн на мх, по цвет, нж возможно/контакты есть, помнит","in_list":true},{"oblast":"Переяслав","company":"Завод ТочМаш","contact":"Вячеслав Юрійович","phone":"063 88 44 389","email":"tochmash.reduktor.ltd@gmail.com","notes":".","result":"за місяць, норм, в вайбере отпр/після 10го","in_list":true},{"oblast":"Київська","company":"ФОП Селянський","contact":"Олег Анатолійович/секретар","phone":"068 978 92 44","email":"nerzhstal@ukr.net","notes":"нж304","result":"серкретарше прайс, комерц, все передасть","in_list":true},{"oblast":"Одесса","company":"АльтаирПлюс","contact":"Анна(хорошая)","phone":"048 705 42 44","email":"altairpluspp@gmail.com","notes":"на начало августа набери","result":"Аня занимается закупками, с мх работают, интерес алюм, нж, возили им с Киева окисленную оцинк, осторожны, приятная","in_list":false},{"oblast":"Демидов, Вышгород","company":"ТОВ НВФ Робикон","contact":"Анатолий Юрьевич руководитель","phone":"(044) 586 26 33, 093 358 55 66 Алексей","email":"apr@robikon.com","notes":".","result":"через 2 недели, секретарша, оч серьезный/с Алексеем после праздн","in_list":false},{"oblast":"Не вказано","company":"ЗМК Кременчуг","contact":"Людмила Петровна","phone":"067 638 61 31","email":"","notes":"на сайте узнать телефоны КБК","result":"сейчас на давальч, апрель/до лета","in_list":false},{"oblast":"Хмельн обл","company":"ТОВ Красилівагромаш","contact":"","phone":"067 381 04 21","email":"","notes":"","result":"нема, в квітні/з 15го прац","in_list":false},{"oblast":"Київська","company":"ДКТБ Патона","contact":"Валерий Борисович","phone":"200 85 56","email":"","notes":"чтото с тел","result":"взял мой номер, плиты 25-30 ст3 /отк!","in_list":false},{"oblast":"Київська","company":"завод універсальних машин","contact":"","phone":"","email":"gorlush@gmail.com","notes":"листы рядовые, алюминий","result":"только коммерч на почту","in_list":true},{"oblast":"Днепр","company":"ДукоТехник","contact":"спросить Татьяна Васильевна","phone":"056 767 15 52","email":"trade@duco.com.ua","notes":"нж304/430 листы 1,1,2-3*1,5*3","result":"в понедельник /коммерч, прайс/пищ по 82грн/только ав","in_list":true},{"oblast":"Бориспольская","company":"Енергетик","contact":"Михаил Григорьевич","phone":"099 530 05 40","email":"ez_energetic@meta.ua","notes":"редко","result":"норм мужик, записал контакт, калибр черн и нж/немного латуни","in_list":true},{"oblast":"Львів","company":"ІСВ Інжиніринг","contact":"Ігор","phone":"097 863 96 18","email":"","notes":"","result":"в понеділок/противный тип, все по месту, сам наберет","in_list":false},{"oblast":"Самбір","company":"Самбірська еко-цегла","contact":"Валентин","phone":"032 363 42 00, (067) 343-42-00","email":"0673434200@ukr.net","notes":"рядовий чорний","result":"квадрат+полоса/дасть відповідь на пошту/снабж Валентин, є замовл, спочатку подивитись склад","in_list":true},{"oblast":"Київська","company":"Крохмалепродукти України","contact":"Павло Костянтинович","phone":"098 270 02 07","email":"","notes":"","result":"ав/мх, свої машини, завтра с 10-12 прорахунок/з мобільного","in_list":false},{"oblast":"Чернигов","company":"Українська аграрна техніка","contact":"Максим","phone":"050 473 06 41","email":"max.papka@ukr.net","notes":"нж/черн, круги, трубы толстостенные, профильные с завода, очень много","result":"закупка раз в пол года","in_list":true},{"oblast":"Київська","company":"Дуга-Инжиниринг","contact":"Андрей (нормальный)","phone":"097 935 27 11","email":"info@duga.kiev.ua","notes":"листы нж пищ","result":"заявок нету как таковых","in_list":false},{"oblast":"Чернигов обл","company":"Лидер-МСК/РеспктПлюс","contact":"попросити Мария Анатолиевна","phone":"(046) 452 59 16","email":"arkonbmz@ukr.net","notes":"листы хк 0,8, 1,2, 1,5 гк3мм, труба проф 60*40*1,5","result":"набери во вторник, будет что-то","in_list":true},{"oblast":"Хмельн обл","company":"ТОВ Старокостянтинівцукор","contact":"Виктор (снабжение, очень хороший), Дмитрий (начальник)","phone":"(098) 351-56-45, (097) 903 36 19","email":"stda-da@meta.ua","notes":"много черного, так же нж","result":"закупка раз в неделю, машинные нормы, Арматуру по 16500 берет 10,12,16, АВ, Метинвест, Листы 8,10,20, Трубы профильные почти все берут, круги по месту если маленькое количество","in_list":true},{"oblast":"Одесса","company":"АрксСталь","contact":"Валерий руководитель","phone":"067 581 55 20/ 067 482 22 53","email":"arx_steel@ukr.net","notes":".","result":"коммерч, позже набрать, спрос снабженца/все по месту по тем же ценам","in_list":true},{"oblast":"Славутич","company":"УкрВентПромпостач","contact":"","phone":"096 225 03 14","email":"ukr_vent@ukr.net","notes":".","result":"коммерч","in_list":true},{"oblast":"Кировоград","company":"ВТП Арбелон","contact":"Сергей Алексеевич/Богдан","phone":"050 341 37 10","email":"arbelon-kr@ukr.net","notes":"только медные и алюм полосы","result":"немного и дешево берут только полосы","in_list":true},{"oblast":"Київська","company":"Укркомплектмонтажналагоджування","contact":"Виктор Николаевич","phone":"553 20 15","email":"ukmn@ukr.net","notes":"черн+нж","result":"редко","in_list":true},{"oblast":"Харьков","company":"ПрАТ Енергооблік/АТ Тахіон","contact":"Дмитрий","phone":"057 734 99 17","email":"gabdullin@energo.kh.ua","notes":"круг 12 ст20 2м","result":"круги/поковки ст20 запрос/дорого/шестигр","in_list":true},{"oblast":"Київська","company":"ТОВ ТПК Промимпекс/завод гидроарматуры","contact":"Татьяна Григорьевна","phone":"451 89 52","email":"","notes":"много всего","result":"уже через неделю","in_list":false},{"oblast":"БЦ","company":"Магнет","contact":"Алексей/новый снабж Алла?","phone":"067 547 14 84","email":"info@magnet.com.ua","notes":"листы/нж/алюм","result":"норм/записан","in_list":true},{"oblast":"Київська","company":"ТОВ ЮпитерГрупп","contact":"Андрей Александрович","phone":"067 430 60 42","email":"0674306042a@gmail.com","notes":".","result":"коммерч/пока на давальч/не планируют","in_list":true},{"oblast":"Він обл","company":"Бершадський птахокомбинат","contact":"Олександр Васильович","phone":"067 999 78 23","email":"","notes":"все","result":"норм","in_list":false},{"oblast":"Турійськ Волнськ обл","company":"Турійське лісове господарство","contact":"Олександр Петрович","phone":"096 921 91 09","email":"","notes":".","result":"отпуск до средины июня","in_list":false},{"oblast":"Хмельн обл","company":"ТОВ РМЗ Білогір*яЕко","contact":"","phone":"0384121238","email":"bileko@i.ua","notes":".","result":"тільки купили, в травні/не розглядають","in_list":true},{"oblast":"Не вказано","company":"Будкомплект","contact":"Виктор","phone":"0675098778","email":"","notes":".","result":"редко","in_list":false},{"oblast":"Полтава","company":"Віптехнолоджі","contact":"Алена","phone":"05325 63892","email":"vip.tehnol@gmail.com","notes":"лист нж3 пищ","result":"не настроены работать, есть свои поставщики/морозится","in_list":true},{"oblast":"Сумы/БЦ","company":"Майнхауз","contact":"Александр","phone":"050 605 99 80","email":"","notes":"350-450*2 сварная 5-6м","result":"по месту берет в бц, коммерч/труба нж крупная/стенка 2","in_list":false},{"oblast":"Київська","company":"СтройГарантИнвест","contact":"Игорь","phone":"067 913 33 23","email":"9133323@gmail.com","notes":"в основном черный, много всего по заказу","result":"нач отд снабж, передаст контакт ребятам","in_list":false},{"oblast":"Не вказано","company":"Ммбуд","contact":"Олег","phone":"0975076593","email":"mmbyd@ukr.net","notes":".","result":"после 10 мая/чрз мес","in_list":false},{"oblast":"Краматорск","company":"ЭкоМодуль","contact":"Елена","phone":"067 783 83 42","email":"","notes":"мороз??","result":"май","in_list":false},{"oblast":"Запорожье","company":"НПП Запорожские Тепловые Системы","contact":"Руслан","phone":"093 467 26 65","email":"bereza7zap@gmail.com","notes":"бш трубы, профнастил, нж, черн","result":"норм мужик/вроде записал, наберет по заказу","in_list":true},{"oblast":"Не вказано","company":"ИнжинирингТрейд ТОВ","contact":"Александр","phone":"095 724 33 55","email":"engineering.ua@ukr.net","notes":"мх","result":"все у своих, заказы раз в нед, с пон","in_list":true},{"oblast":"Черк обл","company":"Дзензелівський котлобудівний завод","contact":"Юрій","phone":"098 700 51 90","email":"2016dkz@gmail.com","notes":".","result":"з літа сезон, Юрій відповід особа/стоїть вир-во","in_list":true},{"oblast":"Львів","company":"БудТехСервіс ЛТД","contact":"Андрій Іванович","phone":"067 370 01 26","email":"office_bts@ukr.net","notes":"рядовий чорний метал","result":"комерц на пошту","in_list":false},{"oblast":"Харьков","company":"Оргтехавтоматика ТОВ","contact":"директор занимается","phone":"057 754 72 94","email":"ota@ukr.net","notes":"трубочки цвет мет","result":"сейчас на больничном","in_list":true},{"oblast":"Рівне","company":"ГефестПрофі","contact":"Марію запитати","phone":"0673632180","email":"","notes":"труба бш","result":"Мх, з дніпра також/опл по факту, поганий досвід","in_list":false},{"oblast":"Луцк","company":"Корунд НВФ","contact":"Світлана бухгалтер","phone":"0332261666","email":"nvf_korund@ukr.net","notes":"спецсталі/55с2а","result":"комерц, контакти, скидають потреби","in_list":true},{"oblast":"Не вказано","company":"ПромГидроСила","contact":"","phone":"067 273 94 79","email":"","notes":".","result":"по месту мало, чрз нед","in_list":false},{"oblast":"Не вказано","company":"РокДизайн","contact":"","phone":"0674446700","email":"","notes":"Вова набирает","result":"труба 60*30*3","in_list":false},{"oblast":"Не вказано","company":"Глеман ТОВ","contact":"Сергей","phone":"050 423 71 17","email":"","notes":".","result":"","in_list":false},{"oblast":"Ромны/Сумы","company":"Тракторозапчасть Роменский завод","contact":"Вера Сергеевна","phone":"068 34 28 277","email":"dovvera86@gmail.com","notes":"800т в мес","result":"можно пробовать по мелочам, много всего берут, возм бронза, первая отгрузка опл по факту, все контакты","in_list":true},{"oblast":"Не вказано","company":"Днепротяжмаш","contact":"Виталий Иванович","phone":"097 408 25 12","email":"","notes":"заказы 3 раза в неделю, в приоритете договор и отсрочка","result":"формируют, почта есть, отправит","in_list":false},{"oblast":"Вінниця","company":"Винпромсервис","contact":"Олег Васильович","phone":"067 431 20 86","email":"","notes":"не багато, по місцю","result":"","in_list":false},{"oblast":"Не вказано","company":"Спорттехника","contact":"Александр","phone":"093 380 94 15","email":"","notes":".","result":"отср пара дней","in_list":false},{"oblast":"Київська","company":"Веда-Техно","contact":"Екатерина (тоже занимается0","phone":"(044) 574 96 50","email":"veda.t@ukr.net","notes":".","result":"вроде просто секретарша, типа берут на соседнем диамете","in_list":true},{"oblast":"Київська","company":"ПП Віксен","contact":"Владимир Александрович (нормальный)","phone":"(067) 232 47 69","email":"v.vorontsov@ukr.net","notes":"профнастил около 1000м, через 2 недельки получить, уже в мукачеве","result":"дали за 100тыс, на 28тыс дешевле, сбросит мне счет конкурентов на почту","in_list":true},{"oblast":"Киев/Вышгород","company":"Факторія-Агро","contact":"Татьяна (нормальная)","phone":"(044) 240-04-20, (066) 047-85-18 (Тани)","email":"zakupka1@faktoria-agro.ua","notes":"МХ,АВ , счета віставлять по низким ценам с правильнім весом и информацией о стали","result":"труба 80*40*2 132м/не знают, пока тишина","in_list":false},{"oblast":"Киев/Чабаны/Коцюбинское","company":"Атлант Инжиниринг","contact":"Тарас","phone":"(050) 338-46-42","email":"","notes":"пызныше набирай","result":"шукають альтернативу мх/чорний рядовий, листи, хвг труби","in_list":false},{"oblast":"Вышгород?","company":"ТОВ ВП Деус Т","contact":"Андрей","phone":"(096) 388-21-19","email":"","notes":"смс","result":"черн, нж/должна быть","in_list":false},{"oblast":"Луцька","company":"Електросервіс","contact":"Микола (гроші бере)","phone":"(097) 399-71-27","email":"","notes":"откаті, берет","result":"лист 3 х/к 3,4тонни, договір з Метінвестом бреше","in_list":false},{"oblast":"Вінниця","company":"ПАО \"Барский машиностроительный завод\"","contact":"Сергей Анатолиевич","phone":"(067) 432-26-95","email":"barsnab@ukr.net","notes":"пока нету, набирайте переодически","result":".","in_list":true}];
+
+function migrateOldData(){
+  if(!confirm('Перенести '+RAW_DATA.length+' клієнтів зі старої бази в Google Sheets?\nЦе замінить поточні дані в хмарі!'))return;
+  var today=new Date().toISOString().split('T')[0];
+  var migrated=RAW_DATA.map(function(c,i){
+    return Object.assign({},c,{
+      id:i,
+      _email:c.email||'',
+      edrpou:c.edrpou||'',
+      delivery:c.delivery||'',
+      delivery_note:c.delivery_note||'',
+      contact_date:c.contact_date||'',
+      next_contact:c.next_contact||'',
+      added_at:c.added_at||today,
+      result:c.result||'',
+      _deleted:false
+    });
+  });
+  showLoading('Перенесення '+migrated.length+' клієнтів в хмару...');
+  saveClientsToGS(migrated, function(ok){
+    hideLoading();
+    if(ok){
+      clients=migrated;
+      nextId=migrated.length;
+      initObl();
+      applyCV();
+      restoreSortHeader();
+      ra();
+      showT('Перенесено '+migrated.length+' клієнтів в Google Sheets ✓','ok');
+      var mb=document.getElementById('migrateBanner');
+      if(mb)mb.style.display='none';
+    }else{
+      showT('Помилка переносу','wn');
+    }
+  });
+}
+
+/* ══════════════════════════════════════
+   CORE CRM CODE
+   ══════════════════════════════════════ */
+
+var today=new Date();today.setHours(0,0,0,0);
+function ts(){return today.toISOString().split('T')[0];}
+function fD(d){if(!d)return '—';var p=d.split('-');return p[2]+'.'+p[1]+'.'+p[0];}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+
+/* ─ COLUMN CONFIG ─ */
+var COLS=[
+  {k:'idx',       vis:true,  ns:true,  def:'38px'},
+  {k:'company',   vis:true,  ns:false, def:'210px'},
+  {k:'oblast',    vis:true,  ns:false, def:'120px'},
+  {k:'contact',   vis:true,  ns:false, def:'155px'},
+  {k:'phone',     vis:true,  ns:true,  def:'155px'},
+  {k:'email',     vis:true,  ns:false, def:'195px'},
+  {k:'edrpou',    vis:true,  ns:false, def:'92px'},
+  {k:'delivery',  vis:true,  ns:false, def:'90px'},
+  {k:'notes',     vis:true,  ns:true,  def:'auto'},
+  {k:'contact_date',vis:true,ns:false, def:'112px'},
+  {k:'next_contact',vis:true,ns:false, def:'116px'},
+  {k:'added_at',  vis:true,  ns:false, def:'102px'},
+  {k:'in_list',   vis:true,  ns:false, def:'108px'},
+  {k:'actions',   vis:true,  ns:true,  def:'72px'},
+];
+var HIDDEN_W='28px';
+
+/* ─ PREFS (localStorage) ─ */
+function savePrefs(){
+  try{
+    var prefs={cols:{},sort:{k:sortK,d:sortD}};
+    COLS.forEach(function(c){prefs.cols[c.k]=c.vis;});
+    localStorage.setItem('sn_crm_prefs',JSON.stringify(prefs));
+  }catch(e){}
+}
+function loadPrefs(){
+  try{
+    var raw=localStorage.getItem('sn_crm_prefs');
+    if(!raw)return;
+    var p=JSON.parse(raw);
+    if(p.cols) COLS.forEach(function(c){if(p.cols.hasOwnProperty(c.k))c.vis=p.cols[c.k];});
+    if(p.sort){sortK=p.sort.k;sortD=p.sort.d;}
+  }catch(e){}
+}
+
+/* ─ COL VISIBILITY ─ */
+function thToggle(e,k){
+  e.stopPropagation();
+  var c=COLS.find(function(x){return x.k===k;});
+  if(c){c.vis=!c.vis;applyCV();savePrefs();}
+}
+function applyCV(){
+  COLS.forEach(function(c){
+    /* th */
+    var th=document.querySelector('th[data-k="'+c.k+'"]');
+    if(th){
+      if(c.k==='idx'||c.k==='actions'){return;}
+      th.classList.toggle('col-hidden',!c.vis);
+      /* update title/tooltip */
+      var eye=th.querySelector('.th-eye');
+      if(eye) eye.title=c.vis?'Приховати':'Показати';
+    }
+    /* col */
+    var col=document.getElementById('c'+c.k.replace('_','').substring(0,2));
+    /* fallback col lookup by data-k */
+    var col2=document.querySelector('col[data-k="'+c.k+'"]');
+    if(col2){col2.style.width=c.vis?c.def:HIDDEN_W;}
+    /* td cells */
+    document.querySelectorAll('td[data-k="'+c.k+'"]').forEach(function(td){
+      td.classList.toggle('hidden-td',!c.vis);
+    });
+  });
+}
+
+/* ─ SORT STATE ─ */
+var sortK='added_at',sortD=-1;
+var filt='all',obl='',srch='',dq='',de='',addF='';
+var editId=null;
+
+/* ─ FILTER ─ */
+function getFilt(){
+  var arr=clients.filter(function(c){return !c._deleted;});
+  if(filt==='has_email')   arr=arr.filter(function(c){return !!c._email;});
+  if(filt==='no_email')    arr=arr.filter(function(c){return !c._email;});
+  if(filt==='in_list')     arr=arr.filter(function(c){return c.in_list;});
+  if(filt==='not_in_list') arr=arr.filter(function(c){return !c.in_list;});
+  if(filt==='new_today')   arr=arr.filter(function(c){return c.added_at===ts();});
+  if(obl) arr=arr.filter(function(c){return c.oblast===obl;});
+  if(srch){var q=srch.toLowerCase();arr=arr.filter(function(c){
+    return (c.company+c.contact+c._email+c.phone+c.notes+c.result+c.edrpou+c.oblast).toLowerCase().indexOf(q)>=0;
+  });}
+  var now=ts();
+  if(dq==='today')    arr=arr.filter(function(c){return c.next_contact===now;});
+  if(dq==='tomorrow'){var t2=new Date(today);t2.setDate(t2.getDate()+1);var t2s=t2.toISOString().split('T')[0];
+    arr=arr.filter(function(c){return c.next_contact===t2s;});}
+  if(dq==='week'){var wk=new Date(today);wk.setDate(wk.getDate()+7);var wks=wk.toISOString().split('T')[0];
+    arr=arr.filter(function(c){return c.next_contact&&c.next_contact>=now&&c.next_contact<=wks;});}
+  if(dq==='overdue')  arr=arr.filter(function(c){return c.next_contact&&c.next_contact<now;});
+  if(de) arr=arr.filter(function(c){return c.next_contact===de||c.contact_date===de;});
+  if(addF==='today')  arr=arr.filter(function(c){return c.added_at===now;});
+  if(addF==='week'){var aw=new Date(today);aw.setDate(aw.getDate()-7);var aws=aw.toISOString().split('T')[0];
+    arr=arr.filter(function(c){return c.added_at>=aws;});}
+  if(addF==='month'){var am=new Date(today);am.setMonth(am.getMonth()-1);var ams=am.toISOString().split('T')[0];
+    arr=arr.filter(function(c){return c.added_at>=ams;});}
+  if(sortK){arr=arr.slice().sort(function(a,b){
+    var va,vb;
+    if(sortK==='in_list'){va=a.in_list?1:0;vb=b.in_list?1:0;}
+    else{va=(a[sortK]||'').toString().toLowerCase();vb=(b[sortK]||'').toString().toLowerCase();}
+    return va<vb?-sortD:va>vb?sortD:0;
+  });}
+  return arr;
+}
+
+function dcls(d){
+  if(!d)return 'dc';
+  var now=ts();
+  if(d<now)return 'dc od';
+  if(d===now)return 'dc td';
+  var s3=new Date(today);s3.setDate(s3.getDate()+3);
+  if(d<=s3.toISOString().split('T')[0])return 'dc sn';
+  return 'dc';
+}
+
+/* ─ RENDER ─ */
+function ra(){
+  addF=document.getElementById('addSel').value;
+  var arr=getFilt();
+  var all=clients.filter(function(c){return !c._deleted;});
+  var tdArr=all.filter(function(c){return c.next_contact===ts();});
+  document.getElementById('sTotal').innerHTML='Всього: <strong>'+all.length+'</strong>';
+  document.getElementById('sNoEmail').innerHTML='&#9888; Без email: <strong>'+all.filter(function(c){return !c._email;}).length+'</strong>';
+  document.getElementById('sInList').innerHTML='&#128231; В розсилці: <strong>'+all.filter(function(c){return c.in_list;}).length+'</strong>';
+  document.getElementById('sToday').innerHTML='&#128197; Дзвонити сьогодні: <strong>'+tdArr.length+'</strong>';
+  document.getElementById('cnt').textContent=arr.length+' записів';
+  var bn=document.getElementById('rbanner'),ri=document.getElementById('rItems');
+  if(tdArr.length){bn.classList.add('show');ri.innerHTML=tdArr.map(function(c){
+    return '<span class="rbi" onclick="openEdit('+c.id+')">&#128222; '+esc(c.company)+'</span>';
+  }).join('');}else{bn.classList.remove('show');}
+  var tb=document.getElementById('tb');
+  if(!arr.length){
+    tb.innerHTML='<tr class="empty-row"><td colspan="14">&#128270; Нічого не знайдено</td></tr>';
+    return;
+  }
+  tb.innerHTML=arr.map(function(c,idx){
+    var ec=c._email?'<span class="ev">'+esc(c._email)+'</span>':'<span class="em">&#9888; Не вказано</span>';
+    var bd=c.in_list?'<span class="by">&#10003; Так</span>':'<span class="bn">— Ні</span>';
+    var nt=[c.notes,c.result].filter(function(n){return n&&n.trim()&&n!=='.';}).join(' | ');
+    var ns=nt.length>52?nt.substring(0,52)+'…':nt;
+    var cls=(c._email?'has-em':'no-em')+(c.added_at===ts()?' nr':'');
+    return '<tr class="'+cls+'" data-id="'+c.id+'">'
+     +'<td class="ti" data-k="idx">'+(idx+1)+'</td>'
+     +'<td class="tc" data-k="company" title="'+esc(c.company)+'">'+esc(c.company)+'</td>'
+     +'<td data-k="oblast"><span class="op">'+esc(c.oblast||'—')+'</span></td>'
+     +'<td data-k="contact" title="'+esc(c.contact||'')+'">'+esc(c.contact&&c.contact!='.'?c.contact:'—')+'</td>'
+     +'<td data-k="phone">'+esc(c.phone&&c.phone!='.'?c.phone:'—')+'</td>'
+     +'<td data-k="email">'+ec+'</td>'
+     +'<td data-k="edrpou" style="color:var(--muted)">'+esc(c.edrpou||'—')+'</td>'
+     +'<td data-k="delivery">'+(c.delivery?(
+       '<span title="'+esc(c.delivery_note||'')+'">'+esc(c.delivery)+'</span>'
+       +(c.delivery_note?'<span style="font-size:10px;color:var(--muted);margin-left:4px" title="'+esc(c.delivery_note)+'">&#128204;</span>':'')
+     ):'<span style="color:var(--muted2)">—</span>')+'</td>'
+     +'<td class="nc" data-k="notes"><span>'+esc(ns||'—')+'</span>'+(nt?'<div class="nf">'+esc(nt)+'</div>':'')+'</td>'
+     +'<td class="dc" data-k="contact_date">'+fD(c.contact_date)+'</td>'
+     +'<td class="'+dcls(c.next_contact)+'" data-k="next_contact">'+fD(c.next_contact)+'</td>'
+     +'<td class="dc" data-k="added_at">'+fD(c.added_at)+'</td>'
+     +'<td data-k="in_list">'+bd+'</td>'
+     +'<td data-k="actions"><div class="ra">'
+       +'<button class="ab" onclick="openEdit('+c.id+')">&#9998;</button>'
+       +'<button class="ab dl" onclick="delC('+c.id+')">&#10005;</button>'
+     +'</div></td>'
+     +'</tr>';
+  }).join('');
+  /* re-apply col visibility to new tds */
+  applyCV();
+}
+
+/* ─ SORT HEADERS ─ */
+document.querySelectorAll('th[data-k]').forEach(function(th){
+  if(th.classList.contains('ns'))return;
+  th.querySelector('.thi').addEventListener('click',function(e){
+    if(e.target.classList.contains('th-eye'))return;
+    var k=th.dataset.k;
+    if(sortK===k)sortD*=-1;else{sortK=k;sortD=1;}
+    document.querySelectorAll('th').forEach(function(t){t.classList.remove('sa','sd');});
+    th.classList.add(sortD===1?'sa':'sd');
+    savePrefs();ra();
+  });
+});
+
+/* ─ DATE FILTERS ─ */
+function onDQ(){dq=document.getElementById('dqSel').value;de='';document.getElementById('dExact').value='';ra();}
+function onDE(){de=document.getElementById('dExact').value;dq='';document.getElementById('dqSel').value='';ra();}
+function setDQ(v){dq=v;de='';document.getElementById('dqSel').value=v;document.getElementById('dExact').value='';ra();}
+
+/* ─ EVENTS ─ */
+document.getElementById('srch').addEventListener('input',function(e){srch=e.target.value.trim();ra();});
+document.getElementById('oblSel').addEventListener('change',function(e){obl=e.target.value;ra();});
+document.querySelectorAll('.fbtn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.fbtn').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');filt=b.dataset.f;ra();
+  });
+});
+
+/* ─ ADD/EDIT ─ */
+function openAdd(){
+  editId=null;
+  document.getElementById('moTitle').textContent='+ Новий клієнт';
+  document.getElementById('moSaveBtn').textContent='Додати клієнта';
+  ['fc','fo','fed','fco','fph','fem','fno','fre','fdlnote'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('fdl').value='';
+  onDlChange();
+  document.getElementById('fcd').value=ts();
+  document.getElementById('fnc').value='';
+  document.getElementById('mainMo').classList.add('open');
+  setTimeout(function(){document.getElementById('fc').focus();},120);
+}
+function openEdit(id){
+  var c=clients.find(function(x){return x.id===id;});if(!c)return;
+  editId=id;
+  document.getElementById('moTitle').textContent='Редагувати: '+c.company;
+  document.getElementById('moSaveBtn').textContent='Зберегти зміни';
+  document.getElementById('fc').value=c.company||'';
+  document.getElementById('fo').value=c.oblast||'';
+  document.getElementById('fed').value=c.edrpou||'';
+  document.getElementById('fco').value=c.contact||'';
+  document.getElementById('fph').value=c.phone||'';
+  document.getElementById('fem').value=c._email||'';
+  document.getElementById('fdl').value=c.delivery||'';
+  document.getElementById('fdlnote').value=c.delivery_note||'';
+  onDlChange();
+  document.getElementById('fno').value=(c.notes&&c.notes!='.')?c.notes:'';
+  document.getElementById('fre').value=c.result||'';
+  document.getElementById('fcd').value=c.contact_date||'';
+  document.getElementById('fnc').value=c.next_contact||'';
+  document.getElementById('mainMo').classList.add('open');
+}
+function saveMo(){
+  var comp=document.getElementById('fc').value.trim();
+  if(!comp){document.getElementById('fc').focus();showT('Вкажіть назву компанії','wn');return;}
+  var d={
+    company:comp,oblast:document.getElementById('fo').value.trim(),
+    edrpou:document.getElementById('fed').value.trim(),
+    contact:document.getElementById('fco').value.trim(),
+    phone:document.getElementById('fph').value.trim(),
+    _email:document.getElementById('fem').value.trim().toLowerCase(),
+    email:document.getElementById('fem').value.trim().toLowerCase(),
+    delivery:document.getElementById('fdl').value,
+    delivery_note:document.getElementById('fdlnote').value.trim(),
+    notes:document.getElementById('fno').value.trim(),
+    result:document.getElementById('fre').value.trim(),
+    contact_date:document.getElementById('fcd').value,
+    next_contact:document.getElementById('fnc').value,
+  };
+  if(editId!==null){
+    var c=clients.find(function(x){return x.id===editId;});
+    if(c)Object.assign(c,d);
+    showT('Зміни збережено','ok');saveToGS();
+  }else{
+    var nc=Object.assign({},d,{id:nextId++,in_list:false,_deleted:false,added_at:ts()});
+    clients.unshift(nc);addObl(nc.oblast);
+    showT('Клієнта додано','ok');
+  }
+  closeMo();ra();saveToGS();
+}
+function addObl(v){
+  if(!v)return;
+  var opts=[].slice.call(document.getElementById('oblSel').options).map(function(o){return o.value;});
+  if(opts.indexOf(v)<0){var opt=document.createElement('option');opt.value=v;opt.textContent=v;document.getElementById('oblSel').appendChild(opt);}
+}
+function delC(id){
+  if(!confirm('Видалити клієнта?'))return;
+  var c=clients.find(function(x){return x.id===id;});if(c)c._deleted=true;
+  ra();saveToGS();showT('Видалено','wn');
+}
+function closeMo(){document.getElementById('mainMo').classList.remove('open');editId=null;}
+document.getElementById('mainMo').addEventListener('click',function(e){if(e.target.id==='mainMo')closeMo();});
+
+/* ─ EXPORT ─ */
+function doExport(){
+  var arr=getFilt();
+  var LABELS={company:'Підприємство',oblast:'Область',edrpou:'ЄДРПОУ',contact:'Контакт',
+    phone:'Телефон',email:'Email',delivery:'Доставка',notes:'Нотатки',result:'Результат',
+    contact_date:'Дата контакту',next_contact:"Зв'язатись",added_at:'Дата в базі',in_list:'Розсилка'};
+  var vc=COLS.filter(function(c){return c.vis&&c.k!=='idx'&&c.k!=='actions';});
+  var hdr=vc.map(function(c){return LABELS[c.k]||c.k;});
+  var rows=arr.map(function(c){return vc.map(function(col){
+    if(col.k==='email')return c._email||'';
+    if(col.k==='in_list')return c.in_list?'Так':'Ні';
+    return c[col.k]||'';
+  });});
+  var ws=XLSX.utils.aoa_to_sheet([hdr].concat(rows));
+  ws['!cols']=vc.map(function(c){return{wch:c.k==='notes'?42:c.k==='company'?32:c.k==='contact'?24:18};});
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Клієнти');
+  XLSX.writeFile(wb,'Сталеніт_CRM_'+ts()+'.xlsx');
+  showT('Файл Excel завантажено','ok');
+}
+
+/* ─ TEMPLATE ─ */
+function dlTemplate(){
+  var hdr=['Підприємство','Область','ЄДРПОУ','Контакт','Телефон','Email','Доставка','Нотатки','Результат','Дата контакту','Зв язатись'];
+  var ex=['ТОВ Приклад','Київська','12345678','Іван Іванович','(067) 123-45-67','ivan@example.com','Нова Пошта','Купує листи та труби','Передзвонити в п ятницю','2025-06-01','2025-06-10'];
+  var ws=XLSX.utils.aoa_to_sheet([hdr,ex]);
+  ws['!cols']=hdr.map(function(){return{wch:22};});
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Клієнти');
+  XLSX.writeFile(wb,'Сталеніт_Шаблон.xlsx');
+  showT('Шаблон завантажено','ok');
+}
+
+/* ─ IMPORT ─ */
+var impRows=[],impHdrs=[],impMap={};
+var HMAP={
+  company:['підприємство','компанія','назва','company','firm'],
+  oblast:['область','регіон','oblast','region'],
+  edrpou:['єдрпоу','єдрпо','код','edrpou'],
+  contact:['контакт','контактна особа','піб','contact'],
+  phone:['телефон','phone','тел','моб'],
+  email:['email','e-mail','пошта','mail'],
+  delivery:['доставка','delivery'],
+  notes:['нотатки','notes','деталі','примітки','коментар'],
+  result:['результат','result','підсумок'],
+  contact_date:['дата контакту','contact_date','дата'],
+  next_contact:['next_contact','дата нагадування','передзвонити','зателефонувати'],
+  in_list:['розсилка','in_list'],
+};
+var FLABELS={company:'Підприємство',oblast:'Область',edrpou:'ЄДРПОУ',contact:'Контакт',
+  phone:'Телефон',email:'Email',delivery:'Доставка',notes:'Нотатки',result:'Результат',
+  contact_date:'Дата контакту',next_contact:"Зв'язатись"};
+function doImport(input){
+  var file=input.files[0];if(!file)return;input.value='';
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(!raw.length){showT('Файл порожній','wn');return;}
+      impHdrs=raw[0].map(function(h){return String(h).trim();});
+      impRows=raw.slice(1).filter(function(r){return r.some(function(c){return String(c).trim();});});
+      if(!impRows.length){showT('Не знайдено рядків','wn');return;}
+      impMap={};var used={};
+      impHdrs.forEach(function(h,i){
+        var hl=h.toLowerCase().replace(/[''']/g,' ').trim();
+        Object.keys(HMAP).forEach(function(key){
+          if(used[key])return;
+          var vs=HMAP[key];
+          for(var v=0;v<vs.length;v++){if(hl===vs[v]){impMap[i]=key;used[key]=true;break;}}
+        });
+      });
+      renderImpMo();
+    }catch(err){showT('Помилка читання файлу','wn');}
+  };
+  reader.readAsArrayBuffer(file);
+}
+function renderImpMo(){
+  var hasC=Object.values(impMap).indexOf('company')>=0;
+  document.getElementById('impPrev').innerHTML='<div class="imp-preview">'
+    +'<div class="imp-chip ok">Рядків: <strong>'+impRows.length+'</strong></div>'
+    +'<div class="imp-chip ac">Колонок: <strong>'+impHdrs.length+'</strong></div>'
+    +(hasC?'':'<div class="imp-chip er">Не знайдено колонку Підприємство</div>')
+    +'</div>';
+  var optH='<option value="">— пропустити —</option>'
+    +Object.keys(FLABELS).map(function(k){return'<option value="'+k+'">'+FLABELS[k]+'</option>';}).join('');
+  var mg=document.getElementById('mapGrid');
+  mg.innerHTML=impHdrs.map(function(h,i){
+    return'<div class="maprow"><div class="maplabel" title="'+esc(h)+'">'+esc(h)+'</div>'
+      +'<select class="fi" style="font-size:11px;padding:5px 8px" data-ci="'+i+'" onchange="updMap('+i+',this.value)">'+optH+'</select></div>';
+  }).join('');
+  impHdrs.forEach(function(h,i){
+    var s=mg.querySelector('select[data-ci="'+i+'"]');
+    if(s&&impMap[i])s.value=impMap[i];
+  });
+  document.getElementById('impMap').style.display='block';
+  document.getElementById('impFoot').style.display='flex';
+  document.getElementById('impConfBtn').textContent='Додати '+impRows.length+' клієнтів';
+  document.getElementById('impMo').classList.add('open');
+}
+function updMap(ci,key){
+  Object.keys(impMap).forEach(function(i){if(impMap[i]===key&&parseInt(i)!==ci)delete impMap[i];});
+  if(key)impMap[ci]=key;else delete impMap[ci];
+}
+function confirmImp(){
+  var added=0,skipped=0;
+  impRows.forEach(function(row){
+    var c={};
+    Object.keys(impMap).forEach(function(i){c[impMap[i]]=String(row[parseInt(i)]||'').trim();});
+    if(!c.company){skipped++;return;}
+    ['contact_date','next_contact'].forEach(function(k){
+      if(!c[k])return;
+      if(/^\d{4}-\d{2}-\d{2}$/.test(c[k]))return;
+      try{var d=new Date(c[k]);if(!isNaN(d))c[k]=d.toISOString().split('T')[0];else c[k]='';}catch(e){c[k]='';}
+    });
+    var em=(c.email||'').toLowerCase();
+    var nc=Object.assign({},c,{id:nextId++,email:em,_email:em,in_list:false,_deleted:false,added_at:ts()});
+    clients.unshift(nc);addObl(nc.oblast);added++;
+  });
+  closeImpMo();ra();saveToGS();
+  showT('Додано '+added+' клієнтів'+(skipped?' · пропущено '+skipped:''),'ok');
+}
+function closeImpMo(){
+  document.getElementById('impMo').classList.remove('open');
+  document.getElementById('impPrev').innerHTML='';
+  document.getElementById('impMap').style.display='none';
+  document.getElementById('impFoot').style.display='none';
+  impRows=[];impHdrs=[];impMap={};
+}
+document.getElementById('impMo').addEventListener('click',function(e){if(e.target.id==='impMo')closeImpMo();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeMo();closeImpMo();}});
+
+/* ─ DELIVERY NOTE TOGGLE ─ */
+function onDlChange(){
+  var val=document.getElementById('fdl').value;
+  var wrap=document.getElementById('dlNoteWrap');
+  var lbl=document.getElementById('dlNoteLabel');
+  if(!val){wrap.style.display='none';return;}
+  wrap.style.display='';
+  if(val==='Нова Пошта') lbl.textContent='Нова Пошта — відділення та місто';
+  else if(val==='САТ')   lbl.textContent='САТ — відділення та місто';
+  else                   lbl.textContent='Транспорт — адреса, місто або примітка';
+}
+
+/* ─ COLUMN RESIZE ─ */
+(function(){
+  var STORE_KEY='sn_col_widths';
+  function saveWidths(){
+    try{
+      var w={};
+      document.querySelectorAll('#tbl colgroup col').forEach(function(col){
+        var k=col.dataset.k;
+        if(k) w[k]=col.offsetWidth||parseInt(col.style.width)||0;
+      });
+      localStorage.setItem(STORE_KEY,JSON.stringify(w));
+    }catch(e){}
+  }
+  function loadWidths(){
+    try{
+      var raw=localStorage.getItem(STORE_KEY);
+      if(!raw)return;
+      var w=JSON.parse(raw);
+      document.querySelectorAll('#tbl colgroup col').forEach(function(col){
+        var k=col.dataset.k;
+        if(k&&w[k]&&w[k]>10) col.style.width=w[k]+'px';
+      });
+    }catch(e){}
+  }
+
+  /* build resize handles */
+  function buildHandles(){
+    var ths=document.querySelectorAll('#tbl thead th');
+    ths.forEach(function(th){
+      if(th.dataset.k==='actions')return;
+      /* avoid duplicate */
+      if(th.querySelector('.rh'))return;
+      var h=document.createElement('div');
+      h.className='rh';
+      th.appendChild(h);
+      var startX,startW,col;
+      h.addEventListener('mousedown',function(e){
+        e.stopPropagation();e.preventDefault();
+        startX=e.clientX;
+        col=document.querySelector('col[data-k="'+th.dataset.k+'"]');
+        startW=col?col.offsetWidth:th.offsetWidth;
+        document.body.style.cursor='col-resize';
+        document.body.style.userSelect='none';
+        function onMove(e2){
+          var dx=e2.clientX-startX;
+          var nw=Math.max(32,startW+dx);
+          if(col) col.style.width=nw+'px';
+        }
+        function onUp(){
+          document.body.style.cursor='';
+          document.body.style.userSelect='';
+          document.removeEventListener('mousemove',onMove);
+          document.removeEventListener('mouseup',onUp);
+          saveWidths();
+        }
+        document.addEventListener('mousemove',onMove);
+        document.addEventListener('mouseup',onUp);
+      });
+    });
+  }
+
+  /* run after DOM ready */
+  window.addEventListener('load',function(){
+    loadWidths();
+    buildHandles();
+  });
+})();
+
+/* ─ TOAST ─ */
+function showT(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+(type||'ok')+' show';
+  setTimeout(function(){t.classList.remove('show');},2600);
+}
+
+/* ─ INIT ─ */
+function initObl(){
+  var ov=[...new Set(clients.map(function(c){return c.oblast;}).filter(Boolean))].sort();
+  var sel=document.getElementById('oblSel');
+  ov.forEach(function(v){var opt=document.createElement('option');opt.value=v;opt.textContent=v;sel.appendChild(opt);});
+}
+function restoreSortHeader(){
+  if(sortK){
+    var th=document.querySelector('th[data-k="'+sortK+'"]');
+    if(th)th.classList.add(sortD===1?'sa':'sd');
+  }
+}
+
+loadPrefs();
+loadFromGS();
+</script>
+
+<!-- LOADING OVERLAY -->
+<div id="gsOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(28,35,51,0.75);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <div style="width:48px;height:48px;border:4px solid rgba(200,169,110,0.3);border-top-color:#c8a96e;border-radius:50%;animation:gspin 0.8s linear infinite;"></div>
+  <div class="gs-msg" style="color:#fff;font-family:Inter,sans-serif;font-size:14px;font-weight:500;letter-spacing:.02em;">Завантаження...</div>
+</div>
+<style>@keyframes gspin{{to{{transform:rotate(360deg)}}}}</style>
+</body>
+</html>
