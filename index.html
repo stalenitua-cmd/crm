@@ -644,21 +644,10 @@ function saveClientsToGS(data,callback){
   var payload={clients:data,nextId:nextId};
   var encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   
-  // First get current SHA
-  fetch(GITHUB_API+'/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
-    headers:{
-      'Authorization':'token '+GITHUB_TOKEN,
-      'Accept':'application/vnd.github.v3+json'
-    }
-  })
-  .then(function(r){return r.status===404?{sha:null}:r.json();})
-  .then(function(existing){
-    var body={
-      message:'CRM update '+new Date().toISOString(),
-      content:encoded
-    };
-    if(existing.sha)body.sha=existing.sha;
-    return fetch(GITHUB_API+'/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
+  function doSave(sha){
+    var body={message:'CRM '+new Date().toISOString(),content:encoded};
+    if(sha)body.sha=sha;
+    fetch(GITHUB_API+'/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
       method:'PUT',
       headers:{
         'Authorization':'token '+GITHUB_TOKEN,
@@ -666,14 +655,25 @@ function saveClientsToGS(data,callback){
         'Content-Type':'application/json'
       },
       body:JSON.stringify(body)
-    });
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.content){callback(true);}
+      else{console.error('Save error:',d);callback(false);}
+    })
+    .catch(function(e){console.error(e);callback(false);});
+  }
+
+  // Get current SHA first
+  fetch(GITHUB_API+'/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
+    headers:{
+      'Authorization':'token '+GITHUB_TOKEN,
+      'Accept':'application/vnd.github.v3+json'
+    }
   })
-  .then(function(r){return r.json();})
-  .then(function(d){
-    if(d.content)callback(true);
-    else{console.error(d);callback(false);}
-  })
-  .catch(function(e){console.error(e);callback(false);});
+  .then(function(r){return r.status===404?{sha:null}:r.json();})
+  .then(function(d){doSave(d.sha||null);})
+  .catch(function(){doSave(null);});
 }
 
 /* ─ MIGRATE OLD DATA ─ */
@@ -696,6 +696,8 @@ function migrateOldData(){
       _deleted:false
     });
   });
+  clients=migrated;
+  nextId=migrated.length+1;
   showLoading('Перенесення '+migrated.length+' клієнтів в хмару...');
   saveClientsToGS(migrated, function(ok){
     hideLoading();
