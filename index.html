@@ -465,6 +465,8 @@ th{position:relative}
   <tr id="thead-row">
     <th class="ns" data-k="idx">
       <div class="thi"><span class="th-lbl">#</span></div></th>
+    <th class="ns" data-k="actions">
+      <div class="thi"><span class="th-lbl">Дії</span></div></th>
     <th data-k="company">
       <div class="thi"><span class="th-lbl">Підприємство</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'company')" title="Приховати">&#128065;</button></div></th>
     <th data-k="oblast">
@@ -489,8 +491,6 @@ th{position:relative}
       <div class="thi"><span class="th-lbl">Дата в базі</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'added_at')" title="Приховати">&#128065;</button></div></th>
     <th data-k="in_list">
       <div class="thi"><span class="th-lbl">Розсилка</span><span class="th-sort"></span><button class="th-eye" onclick="thToggle(event,'in_list')" title="Приховати">&#128065;</button></div></th>
-    <th class="ns" data-k="actions" style="text-align:right">
-      <div class="thi" style="justify-content:flex-end"><span class="th-lbl">Дії</span></div></th>
   </tr>
   </thead>
   <tbody id="tb"></tbody>
@@ -688,20 +688,20 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 /* ─ COLUMN CONFIG ─ */
 var COLS=[
-  {k:'idx',       vis:true,  ns:true,  def:'38px'},
-  {k:'company',   vis:true,  ns:false, def:'210px'},
-  {k:'oblast',    vis:true,  ns:false, def:'120px'},
-  {k:'contact',   vis:true,  ns:false, def:'155px'},
-  {k:'phone',     vis:true,  ns:true,  def:'155px'},
-  {k:'email',     vis:true,  ns:false, def:'195px'},
-  {k:'edrpou',    vis:true,  ns:false, def:'92px'},
-  {k:'delivery',  vis:true,  ns:false, def:'90px'},
+  {k:'idx',       vis:true,  ns:true,  def:'34px'},
+  {k:'actions',   vis:true,  ns:true,  def:'56px'},
+  {k:'company',   vis:true,  ns:false, def:'170px'},
+  {k:'oblast',    vis:true,  ns:false, def:'100px'},
+  {k:'contact',   vis:true,  ns:false, def:'120px'},
+  {k:'phone',     vis:true,  ns:true,  def:'120px'},
+  {k:'email',     vis:true,  ns:false, def:'150px'},
+  {k:'edrpou',    vis:true,  ns:false, def:'76px'},
+  {k:'delivery',  vis:true,  ns:false, def:'76px'},
   {k:'notes',     vis:true,  ns:true,  def:'auto'},
-  {k:'contact_date',vis:true,ns:false, def:'112px'},
-  {k:'next_contact',vis:true,ns:false, def:'116px'},
-  {k:'added_at',  vis:true,  ns:false, def:'102px'},
-  {k:'in_list',   vis:true,  ns:false, def:'108px'},
-  {k:'actions',   vis:true,  ns:true,  def:'72px'},
+  {k:'contact_date',vis:true,ns:false, def:'92px'},
+  {k:'next_contact',vis:true,ns:false, def:'96px'},
+  {k:'added_at',  vis:true,  ns:false, def:'84px'},
+  {k:'in_list',   vis:true,  ns:false, def:'86px'},
 ];
 var HIDDEN_W='28px';
 
@@ -829,6 +829,10 @@ function ra(){
     var cls=(c._email?'has-em':'no-em')+(c.added_at===ts()?' nr':'');
     return '<tr class="'+cls+'" data-id="'+c.id+'">'
      +'<td class="ti" data-k="idx">'+(idx+1)+'</td>'
+     +'<td data-k="actions"><div class="ra">'
+       +'<button class="ab" onclick="openEdit('+c.id+')">&#9998;</button>'
+       +'<button class="ab dl" onclick="delC('+c.id+')">&#10005;</button>'
+     +'</div></td>'
      +'<td class="tc" data-k="company" title="'+esc(c.company)+'">'+esc(c.company)+'</td>'
      +'<td data-k="oblast"><span class="op">'+esc(c.oblast||'—')+'</span></td>'
      +'<td data-k="contact" title="'+esc(c.contact||'')+'">'+esc(c.contact&&c.contact!='.'?c.contact:'—')+'</td>'
@@ -844,10 +848,6 @@ function ra(){
      +'<td class="'+dcls(c.next_contact)+'" data-k="next_contact">'+fD(c.next_contact)+'</td>'
      +'<td class="dc" data-k="added_at">'+fD(c.added_at)+'</td>'
      +'<td data-k="in_list">'+bd+'</td>'
-     +'<td data-k="actions"><div class="ra">'
-       +'<button class="ab" onclick="openEdit('+c.id+')">&#9998;</button>'
-       +'<button class="ab dl" onclick="delC('+c.id+')">&#10005;</button>'
-     +'</div></td>'
      +'</tr>';
   }).join('');
   /* re-apply col visibility to new tds */
