@@ -775,7 +775,11 @@ function saveClientsToGS(data,callback){
    ══════════════════════════════════════ */
 
 var today=new Date();today.setHours(0,0,0,0);
-function ts(){return today.toISOString().split('T')[0];}
+function fmtLocalDate(d){
+  var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),da=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+da;
+}
+function ts(){return fmtLocalDate(today);}
 function fD(d){if(!d)return '—';var p=d.split('-');return p[2]+'.'+p[1]+'.'+p[0];}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 var SENDER_EMAIL='stalenitua@gmail.com';
@@ -883,16 +887,16 @@ function getFilt(){
   });}
   var now=ts();
   if(dq==='today')    arr=arr.filter(function(c){return c.next_contact===now;});
-  if(dq==='tomorrow'){var t2=new Date(today);t2.setDate(t2.getDate()+1);var t2s=t2.toISOString().split('T')[0];
+  if(dq==='tomorrow'){var t2=new Date(today);t2.setDate(t2.getDate()+1);var t2s=fmtLocalDate(t2);
     arr=arr.filter(function(c){return c.next_contact===t2s;});}
-  if(dq==='week'){var wk=new Date(today);wk.setDate(wk.getDate()+7);var wks=wk.toISOString().split('T')[0];
+  if(dq==='week'){var wk=new Date(today);wk.setDate(wk.getDate()+7);var wks=fmtLocalDate(wk);
     arr=arr.filter(function(c){return c.next_contact&&c.next_contact>=now&&c.next_contact<=wks;});}
   if(dq==='overdue')  arr=arr.filter(function(c){return c.next_contact&&c.next_contact<now;});
   if(de) arr=arr.filter(function(c){return c.next_contact===de||c.contact_date===de;});
   if(addF==='today')  arr=arr.filter(function(c){return c.added_at===now;});
-  if(addF==='week'){var aw=new Date(today);aw.setDate(aw.getDate()-7);var aws=aw.toISOString().split('T')[0];
+  if(addF==='week'){var aw=new Date(today);aw.setDate(aw.getDate()-7);var aws=fmtLocalDate(aw);
     arr=arr.filter(function(c){return c.added_at>=aws;});}
-  if(addF==='month'){var am=new Date(today);am.setMonth(am.getMonth()-1);var ams=am.toISOString().split('T')[0];
+  if(addF==='month'){var am=new Date(today);am.setMonth(am.getMonth()-1);var ams=fmtLocalDate(am);
     arr=arr.filter(function(c){return c.added_at>=ams;});}
   if(sortK){arr=arr.slice().sort(function(a,b){
     var va,vb;
@@ -909,7 +913,7 @@ function dcls(d){
   if(d<now)return 'dc od';
   if(d===now)return 'dc td';
   var s3=new Date(today);s3.setDate(s3.getDate()+3);
-  if(d<=s3.toISOString().split('T')[0])return 'dc sn';
+  if(d<=fmtLocalDate(s3))return 'dc sn';
   return 'dc';
 }
 
@@ -1230,7 +1234,7 @@ function confirmImp(){
     ['contact_date','next_contact'].forEach(function(k){
       if(!c[k])return;
       if(/^\d{4}-\d{2}-\d{2}$/.test(c[k]))return;
-      try{var d=new Date(c[k]);if(!isNaN(d))c[k]=d.toISOString().split('T')[0];else c[k]='';}catch(e){c[k]='';}
+      try{var d=new Date(c[k]);if(!isNaN(d))c[k]=fmtLocalDate(d);else c[k]='';}catch(e){c[k]='';}
     });
     var em=(c.email||'').toLowerCase();
     var nc=Object.assign({},c,{id:nextId++,email:em,_email:em,in_list:false,_deleted:false,added_at:ts()});
