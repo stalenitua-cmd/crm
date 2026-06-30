@@ -36,13 +36,13 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;min-height:100vh;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;height:100vh;overflow:hidden;display:flex;flex-direction:column}
 
 /* ── HEADER (dark navy like site) ── */
 header{
   background:var(--nav);border-bottom:2px solid var(--accent);
   padding:0 24px;display:flex;align-items:center;justify-content:space-between;
-  height:58px;position:sticky;top:0;z-index:300;gap:14px
+  height:58px;flex-shrink:0;z-index:300;gap:14px
 }
 .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .logo-img{
@@ -83,7 +83,7 @@ header{
 .toolbar{
   background:var(--surface);border-bottom:1px solid var(--border);
   padding:10px 24px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;
-  position:sticky;top:58px;z-index:200;
+  flex-shrink:0;z-index:200;
   box-shadow:0 1px 4px rgba(0,0,0,.06)
 }
 .sw{position:relative;flex:1;min-width:180px;max-width:360px}
@@ -128,14 +128,15 @@ select:focus,.di:focus{border-color:var(--accent)}
 /* ── DATE ROW ── */
 .drow{
   background:var(--surface);border-bottom:1px solid var(--border);
-  padding:7px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap
+  padding:7px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  flex-shrink:0;z-index:190
 }
 .drow label{font-size:11px;color:var(--muted);white-space:nowrap;font-weight:500}
 
 /* ── REMINDER BANNER ── */
 .rb{
   background:var(--warning-bg);border-bottom:2px solid #fcd34d;
-  padding:8px 24px;display:none;align-items:center;gap:10px;flex-wrap:wrap
+  padding:8px 24px;display:none;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0
 }
 .rb.show{display:flex}
 .rbt{font-size:12px;font-weight:600;color:var(--warning)}
@@ -148,7 +149,7 @@ select:focus,.di:focus{border-color:var(--accent)}
 /* ── TABLE WRAPPER ── */
 .twrap{
   overflow-x:auto;overflow-y:auto;background:var(--surface);
-  max-height:calc(100vh - 230px)
+  flex:1;min-height:0
 }
 
 /* ── TABLE ── */
@@ -415,13 +416,14 @@ td.hidden-td{display:none}
 ::-webkit-scrollbar-thumb:hover{background:var(--muted2)}
 
 @media(max-width:900px){
-  header{padding:0 14px;height:auto;min-height:54px;flex-wrap:wrap;gap:8px;position:static}
+  body{height:auto;overflow:visible;display:block}
+  header{padding:0 14px;height:auto;min-height:54px;flex-wrap:wrap;gap:8px}
   .logo-img{height:26px}
   .hm{display:none}
   .hr{flex-wrap:wrap;gap:6px;padding:6px 0}
   .btn-hdr{padding:6px 10px;font-size:11px}
   .btn-add{padding:6px 12px;font-size:12px}
-  .toolbar{position:static;padding:8px 12px;flex-direction:column;align-items:stretch}
+  .toolbar{padding:8px 12px;flex-direction:column;align-items:stretch}
   .sw{max-width:none}
   .fg{width:100%}
   .fbtn{flex:1;text-align:center;font-size:11px;padding:6px 8px}
@@ -433,7 +435,7 @@ td.hidden-td{display:none}
   .mb{padding:18px;max-height:92vh}
 
   /* TABLE -> CARD LIST on mobile */
-  .twrap{overflow-x:visible;overflow-y:visible;max-height:none}
+  .twrap{overflow-x:visible;overflow-y:visible;max-height:none;flex:none;min-height:auto}
   table{table-layout:auto}
   thead{display:none}
   tbody{display:flex;flex-direction:column;gap:10px;padding:10px}
