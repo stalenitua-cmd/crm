@@ -735,10 +735,10 @@ function loadFromGS(){
         return Object.assign({},c,{
           id:parseInt(c.id)||0,
           in_list:c.in_list===true||c.in_list==='true',
-          _deleted:false,
+          _deleted:c._deleted===true||c._deleted==='true',
           _email:c._email||c.email||''
         });
-      });
+      }).filter(function(c){return !c._deleted;});
       nextId=data.nextId||clients.length+1;
       hideLoading();initObl();applyCV();restoreSortHeader();ra();
       showT('Завантажено '+clients.length+' клієнтів','ok');
@@ -751,7 +751,8 @@ function loadFromGS(){
 }
 
 function saveToGS(){
-  saveClientsToGS(clients,function(ok){
+  var liveClients=clients.filter(function(c){return !c._deleted;});
+  saveClientsToGS(liveClients,function(ok){
     if(ok)showT('Збережено ✓','ok');
     else showT('Помилка збереження','wn');
   });
