@@ -297,7 +297,7 @@ td.hidden-td{display:none}
 .mo.open{display:flex}
 .mb{
   background:var(--surface);border:1px solid var(--border);border-radius:14px;
-  padding:26px 32px;width:100%;max-width:880px;max-height:92vh;overflow-y:auto;position:relative;
+  padding:26px 36px;width:100%;max-width:1280px;max-height:92vh;overflow-y:auto;position:relative;
   box-shadow:0 20px 60px rgba(0,0,0,.2)
 }
 .mt{
@@ -309,7 +309,11 @@ td.hidden-td{display:none}
 .mc{position:absolute;top:18px;right:18px;background:none;border:none;
   color:var(--muted2);font-size:20px;cursor:pointer;transition:color .2s;line-height:1}
 .mc:hover{color:var(--text)}
-.fg2{display:grid;grid-template-columns:repeat(3,1fr);gap:13px 18px}
+.mo2col{display:grid;grid-template-columns:1.1fr 1fr;gap:0 32px;align-items:start}
+.mocol-l,.mocol-r{display:flex;flex-direction:column;gap:13px}
+.mocol-r{border-left:1px solid var(--border);padding-left:32px}
+.fg3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px 14px}
+.fg2c{display:grid;grid-template-columns:1fr 1fr;gap:13px 14px}
 .ff{display:flex;flex-direction:column;gap:5px}
 .ff.full{grid-column:1/-1}
 .ff.span2{grid-column:span 2}
@@ -427,7 +431,8 @@ td.hidden-td{display:none}
   .drow{padding:8px 12px;flex-direction:column;align-items:stretch;gap:8px}
   .drow label{margin-left:0 !important}
   .drow select,.drow input{max-width:none !important;width:100%}
-  .fg2{grid-template-columns:1fr}.mapgrid{grid-template-columns:1fr}
+  .mo2col{grid-template-columns:1fr}.mocol-r{border-left:none;padding-left:0;border-top:1px solid var(--border);padding-top:13px;margin-top:6px}
+  .fg3{grid-template-columns:1fr}.fg2c{grid-template-columns:1fr}.mapgrid{grid-template-columns:1fr}
   .mb{padding:18px;max-height:92vh}
 
   /* TABLE -> CARD LIST on mobile */
@@ -605,27 +610,29 @@ td.hidden-td{display:none}
   <div class="mb">
     <div class="mt" id="moTitle">Новий клієнт</div>
     <button class="mc" onclick="closeMo()">&#10005;</button>
-    <div class="fg2">
-      <div class="ff full"><div class="fl">Підприємство *</div><input class="fi" id="fc" type="text" placeholder="Назва компанії" required></div>
-      <div class="ff"><div class="fl">Область</div><input class="fi" id="fo" type="text" placeholder="Київська"></div>
-      <div class="ff"><div class="fl">ЄДРПОУ</div><input class="fi" id="fed" type="text" placeholder="12345678" maxlength="10"></div>
-      <div class="ff"><div class="fl">Контактна особа</div><input class="fi" id="fco" type="text" placeholder="ПІБ / посада"></div>
-      <div class="ff"><div class="fl">Телефон</div><input class="fi" id="fph" type="text" placeholder="(067) 000-00-00"></div>
-      <div class="ff"><div class="fl">Email</div><input class="fi" id="fem" type="email" placeholder="email@company.ua"></div>
-      <div class="ff"><div class="fl">Доставка</div>
-        <select class="fi" id="fdl" onchange="onDlChange()">
-          <option value="">— не вказано —</option>
-          <option value="Нова Пошта">&#128230; Нова Пошта</option>
-          <option value="САТ">&#128666; САТ</option>
-          <option value="Транспорт">&#128652; Транспорт</option>
-        </select>
-      </div>
-      <div class="ff full" id="dlNoteWrap" style="display:none">
-        <div class="fl" id="dlNoteLabel">Деталі доставки</div>
-        <textarea class="fta" id="fdlnote" placeholder="Відділення, місто, адреса…" style="min-height:52px"></textarea>
-      </div>
-      <div class="sl">&#127991; Теги / категорія</div>
-      <div class="ff full">
+    <div class="mo2col">
+      <div class="mocol-l">
+        <div class="ff full"><div class="fl">Підприємство *</div><input class="fi" id="fc" type="text" placeholder="Назва компанії" required></div>
+        <div class="fg3">
+          <div class="ff"><div class="fl">Область</div><input class="fi" id="fo" type="text" placeholder="Київська"></div>
+          <div class="ff"><div class="fl">ЄДРПОУ</div><input class="fi" id="fed" type="text" placeholder="12345678" maxlength="10"></div>
+          <div class="ff"><div class="fl">Контактна особа</div><input class="fi" id="fco" type="text" placeholder="ПІБ / посада"></div>
+          <div class="ff"><div class="fl">Телефон</div><input class="fi" id="fph" type="text" placeholder="(067) 000-00-00"></div>
+          <div class="ff"><div class="fl">Email</div><input class="fi" id="fem" type="email" placeholder="email@company.ua"></div>
+          <div class="ff"><div class="fl">Доставка</div>
+            <select class="fi" id="fdl" onchange="onDlChange()">
+              <option value="">— не вказано —</option>
+              <option value="Нова Пошта">&#128230; Нова Пошта</option>
+              <option value="САТ">&#128666; САТ</option>
+              <option value="Транспорт">&#128652; Транспорт</option>
+            </select>
+          </div>
+        </div>
+        <div class="ff full" id="dlNoteWrap" style="display:none">
+          <div class="fl" id="dlNoteLabel">Деталі доставки</div>
+          <textarea class="fta" id="fdlnote" placeholder="Відділення, місто, адреса…" style="min-height:40px"></textarea>
+        </div>
+        <div class="sl">&#127991; Теги / категорія</div>
         <div class="tagpicker" id="tagPicker">
           <button type="button" class="tagopt" data-tag="hot" style="--tc:#dc2626">&#128293; Гарячий лід</button>
           <button type="button" class="tagopt" data-tag="regular" style="--tc:#16a34a">&#128257; Постійний</button>
@@ -633,19 +640,23 @@ td.hidden-td{display:none}
           <button type="button" class="tagopt" data-tag="problem" style="--tc:#d97706">&#9888; Проблемний</button>
           <button type="button" class="tagopt" data-tag="cold" style="--tc:#6b7280">&#10052; Охолов</button>
         </div>
+        <div class="sl">&#128197; Дати</div>
+        <div class="fg2c">
+          <div class="ff"><div class="fl">Дата контакту</div><input class="fd" id="fcd" type="date"></div>
+          <div class="ff"><div class="fl">Зв'язатись (нагадування)</div><input class="fd" id="fnc" type="date"></div>
+        </div>
       </div>
-      <div class="sl">&#128197; Дати</div>
-      <div class="ff"><div class="fl">Дата контакту</div><input class="fd" id="fcd" type="date"></div>
-      <div class="ff"><div class="fl">Зв'язатись (нагадування)</div><input class="fd" id="fnc" type="date"></div>
-      <div class="sl">&#128221; Нотатки</div>
-      <div class="ff full"><div class="fl">Нотатки / деталі</div><textarea class="fta" id="fno" placeholder="Що купують, статус переговорів…"></textarea></div>
-      <div class="ff full"><div class="fl">Результат / коментар</div><textarea class="fta" id="fre" placeholder="Підсумок останнього контакту…"></textarea></div>
-      <div class="sl">&#128172; Історія взаємодій</div>
-      <div class="ff full">
-        <div class="histlog" id="histLog"></div>
-        <div class="histadd">
-          <input class="fi" id="histInput" type="text" placeholder="Додати запис: напр. дзвонив, обіцяв заявку…" onkeydown="if(event.key==='Enter'){event.preventDefault();addHistEntry();}">
-          <button type="button" class="bhist" onclick="addHistEntry()">&#10010; Додати</button>
+      <div class="mocol-r">
+        <div class="sl">&#128221; Нотатки</div>
+        <div class="ff full"><div class="fl">Нотатки / деталі</div><textarea class="fta" id="fno" placeholder="Що купують, статус переговорів…" style="min-height:60px"></textarea></div>
+        <div class="ff full"><div class="fl">Результат / коментар</div><textarea class="fta" id="fre" placeholder="Підсумок останнього контакту…" style="min-height:60px"></textarea></div>
+        <div class="sl">&#128172; Історія взаємодій</div>
+        <div class="ff full">
+          <div class="histlog" id="histLog"></div>
+          <div class="histadd">
+            <input class="fi" id="histInput" type="text" placeholder="Додати запис: напр. дзвонив, обіцяв заявку…" onkeydown="if(event.key==='Enter'){event.preventDefault();addHistEntry();}">
+            <button type="button" class="bhist" onclick="addHistEntry()">&#10010; Додати</button>
+          </div>
         </div>
       </div>
     </div>
