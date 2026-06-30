@@ -328,6 +328,54 @@ td.hidden-td{display:none}
   border-radius:7px;padding:9px 16px;font-size:13px;cursor:pointer;font-family:inherit;
   transition:all .2s;margin-left:auto;display:inline-flex;align-items:center;gap:5px}
 .bdel:hover{background:var(--danger-bg)}
+
+/* TAG PICKER */
+.tagpicker{display:flex;gap:6px;flex-wrap:wrap}
+.tagopt{
+  background:var(--surface2);border:1.5px solid var(--border2);color:var(--text2);
+  border-radius:16px;padding:6px 13px;font-size:12px;cursor:pointer;font-family:inherit;
+  font-weight:500;transition:all .15s
+}
+.tagopt:hover{border-color:var(--tc);color:var(--tc)}
+.tagopt.sel{background:var(--tc);border-color:var(--tc);color:#fff;font-weight:700}
+
+/* TABLE TAG BADGES */
+.tagb{
+  display:inline-flex;align-items:center;gap:3px;border-radius:9px;padding:1px 7px;
+  font-size:10px;font-weight:600;color:#fff;white-space:nowrap
+}
+
+/* HISTORY LOG */
+.histlog{
+  max-height:160px;overflow-y:auto;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;margin-bottom:8px
+}
+.histlog:empty::after{content:'Записів ще немає';color:var(--muted2);font-size:12px;padding:4px}
+.histitem{
+  background:var(--surface);border:1px solid var(--border);border-radius:7px;
+  padding:7px 10px;font-size:12px;line-height:1.5;position:relative
+}
+.histitem .hdate{color:var(--accent);font-weight:700;font-size:10.5px;margin-right:6px}
+.histitem .hdel{
+  position:absolute;right:6px;top:6px;background:none;border:none;color:var(--muted2);
+  cursor:pointer;font-size:11px;padding:2px;line-height:1
+}
+.histitem .hdel:hover{color:var(--danger)}
+.histadd{display:flex;gap:6px}
+.histadd .fi{flex:1}
+.bhist{
+  background:var(--accent);border:none;color:#fff;border-radius:7px;padding:0 14px;
+  font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap
+}
+.bhist:hover{opacity:.88}
+
+/* QUICK ACTIONS (mailto/tel) IN TABLE */
+.qa-link{color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.qa-link:hover{text-decoration:underline;color:var(--accent)}
+
+/* COLD LEAD WARNING */
+.cold-warn{color:var(--warning);font-size:10px;margin-left:3px}
+
 .sl{
   font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-dk);
   font-weight:700;padding:8px 0 2px;border-top:2px solid var(--border);margin-top:6px;grid-column:1/-1
@@ -363,8 +411,57 @@ td.hidden-td{display:none}
 ::-webkit-scrollbar-thumb:hover{background:var(--muted2)}
 
 @media(max-width:900px){
-  header{padding:0 14px}.toolbar,.drow{padding:8px 14px}
-  .hm{display:none}.fg2{grid-template-columns:1fr}.mapgrid{grid-template-columns:1fr}
+  header{padding:0 14px;height:auto;min-height:54px;flex-wrap:wrap;gap:8px;position:static}
+  .logo-img{height:26px}
+  .hm{display:none}
+  .hr{flex-wrap:wrap;gap:6px;padding:6px 0}
+  .btn-hdr{padding:6px 10px;font-size:11px}
+  .btn-add{padding:6px 12px;font-size:12px}
+  .toolbar{position:static;padding:8px 12px;flex-direction:column;align-items:stretch}
+  .sw{max-width:none}
+  .fg{width:100%}
+  .fbtn{flex:1;text-align:center;font-size:11px;padding:6px 8px}
+  .cbadge,.sortbtn{margin-left:0;width:100%;justify-content:center}
+  .drow{padding:8px 12px;flex-direction:column;align-items:stretch;gap:8px}
+  .drow label{margin-left:0 !important}
+  .drow select,.drow input{max-width:none !important;width:100%}
+  .fg2{grid-template-columns:1fr}.mapgrid{grid-template-columns:1fr}
+  .mb{padding:18px;max-height:92vh}
+
+  /* TABLE -> CARD LIST on mobile */
+  .twrap{overflow-x:visible}
+  table{table-layout:auto}
+  thead{display:none}
+  tbody{display:flex;flex-direction:column;gap:10px;padding:10px}
+  tr{
+    display:flex;flex-direction:column;background:var(--surface);
+    border:1px solid var(--border);border-radius:10px;padding:12px;
+    box-shadow:0 1px 4px rgba(0,0,0,.05)
+  }
+  tr.empty-row{padding:40px 16px}
+  td{
+    display:flex;border:none !important;padding:4px 0 !important;
+    width:auto !important;white-space:normal !important;align-items:flex-start;gap:6px
+  }
+  td[data-k="idx"]{position:absolute;top:8px;right:10px;font-size:10px;color:var(--muted2);padding:0!important}
+  tr{position:relative}
+  td[data-k="company"]{
+    font-size:15px;font-weight:700;color:var(--accent-dk);padding-right:28px !important;
+    border-bottom:1px solid var(--border) !important;padding-bottom:8px !important;margin-bottom:4px
+  }
+  td[data-k]:not([data-k="idx"]):not([data-k="company"])::before{
+    content:attr(data-lbl);font-weight:600;color:var(--muted);font-size:10px;
+    text-transform:uppercase;letter-spacing:.05em;min-width:84px;flex-shrink:0;padding-top:1px
+  }
+  td[data-k="notes"]{flex-direction:column}
+  td[data-k="notes"]::before{margin-bottom:2px}
+  .nf{display:none !important}
+  td[data-k="in_list"]{border-top:1px solid var(--border);margin-top:4px;padding-top:8px !important}
+  col{display:none}
+}
+@media(max-width:480px){
+  .fbtn{font-size:10px;padding:5px 6px}
+  .logo-sub{display:none}
 }
 /* ── COLUMN RESIZE HANDLE ── */
 th{position:relative}
@@ -421,6 +518,7 @@ th{position:relative}
     <button class="fbtn" data-f="in_list">&#128231; В розсилці</button>
     <button class="fbtn" data-f="not_in_list">Не в розсилці</button>
     <button class="fbtn" data-f="new_today">&#128274; Нові сьогодні</button>
+    <button class="fbtn" data-f="cold">&#10052; Охолов (30+ днів)</button>
   </div>
   <div class="cbadge" id="cnt">0 записів</div>
   <button class="sortbtn" id="sortDateBtn" onclick="toggleDateSort()" title="Сортувати за датою додавання">
@@ -525,12 +623,30 @@ th{position:relative}
         <div class="fl" id="dlNoteLabel">Деталі доставки</div>
         <textarea class="fta" id="fdlnote" placeholder="Відділення, місто, адреса…" style="min-height:52px"></textarea>
       </div>
+      <div class="sl">&#127991; Теги / категорія</div>
+      <div class="ff full">
+        <div class="tagpicker" id="tagPicker">
+          <button type="button" class="tagopt" data-tag="hot" style="--tc:#dc2626">&#128293; Гарячий лід</button>
+          <button type="button" class="tagopt" data-tag="regular" style="--tc:#16a34a">&#128257; Постійний</button>
+          <button type="button" class="tagopt" data-tag="onetime" style="--tc:#1A467F">&#128230; Разовий</button>
+          <button type="button" class="tagopt" data-tag="problem" style="--tc:#d97706">&#9888; Проблемний</button>
+          <button type="button" class="tagopt" data-tag="cold" style="--tc:#6b7280">&#10052; Охолов</button>
+        </div>
+      </div>
       <div class="sl">&#128197; Дати</div>
       <div class="ff"><div class="fl">Дата контакту</div><input class="fd" id="fcd" type="date"></div>
       <div class="ff"><div class="fl">Зв'язатись (нагадування)</div><input class="fd" id="fnc" type="date"></div>
       <div class="sl">&#128221; Нотатки</div>
       <div class="ff full"><div class="fl">Нотатки / деталі</div><textarea class="fta" id="fno" placeholder="Що купують, статус переговорів…"></textarea></div>
       <div class="ff full"><div class="fl">Результат / коментар</div><textarea class="fta" id="fre" placeholder="Підсумок останнього контакту…"></textarea></div>
+      <div class="sl">&#128172; Історія взаємодій</div>
+      <div class="ff full">
+        <div class="histlog" id="histLog"></div>
+        <div class="histadd">
+          <input class="fi" id="histInput" type="text" placeholder="Додати запис: напр. дзвонив, обіцяв заявку…" onkeydown="if(event.key==='Enter'){event.preventDefault();addHistEntry();}">
+          <button type="button" class="bhist" onclick="addHistEntry()">&#10010; Додати</button>
+        </div>
+      </div>
     </div>
     <div class="mf">
       <button class="bp" id="moSaveBtn" onclick="saveMo()">&#128190; Зберегти</button>
@@ -768,6 +884,15 @@ function applyCV(){
 var sortK='added_at',sortD=-1;
 var filt='all',obl='',srch='',dq='',de='',addF='';
 var editId=null;
+var curTag='';
+var curHistory=[];
+var TAG_INFO={
+  hot:{label:'&#128293; Гарячий лід',color:'#dc2626'},
+  regular:{label:'&#128257; Постійний',color:'#16a34a'},
+  onetime:{label:'&#128230; Разовий',color:'#1A467F'},
+  problem:{label:'&#9888; Проблемний',color:'#d97706'},
+  cold:{label:'&#10052; Охолов',color:'#6b7280'}
+};
 
 /* ─ FILTER ─ */
 function getFilt(){
@@ -777,6 +902,7 @@ function getFilt(){
   if(filt==='in_list')     arr=arr.filter(function(c){return c.in_list;});
   if(filt==='not_in_list') arr=arr.filter(function(c){return !c.in_list;});
   if(filt==='new_today')   arr=arr.filter(function(c){return c.added_at===ts();});
+  if(filt==='cold')        arr=arr.filter(function(c){return isColdLead(c);});
   if(obl) arr=arr.filter(function(c){return c.oblast===obl;});
   if(srch){var q=srch.toLowerCase();arr=arr.filter(function(c){
     return (c.company+c.contact+c._email+c.phone+c.notes+c.result+c.edrpou+c.oblast).toLowerCase().indexOf(q)>=0;
@@ -813,6 +939,17 @@ function dcls(d){
   return 'dc';
 }
 
+/* ─ COLD LEAD DETECTION (30+ days no contact) ─ */
+function isColdLead(c){
+  if(c.tag)return false; /* manual tag takes priority, don't double-flag */
+  var lastDate=c.contact_date||c.added_at;
+  if(!lastDate)return false;
+  var d=new Date(lastDate);
+  if(isNaN(d))return false;
+  var diffDays=Math.floor((today-d)/86400000);
+  return diffDays>=30;
+}
+
 /* ─ RENDER ─ */
 function ra(){
   addF=document.getElementById('addSel').value;
@@ -834,28 +971,35 @@ function ra(){
     return;
   }
   tb.innerHTML=arr.map(function(c,idx){
-    var ec=c._email?'<span class="ev">'+esc(c._email)+'</span>':'<span class="em">&#9888; Не вказано</span>';
+    var ec=c._email?'<a class="ev qa-link" href="mailto:'+esc(c._email)+'" onclick="event.stopPropagation()" title="Написати лист">&#9993; '+esc(c._email)+'</a>':'<span class="em">&#9888; Не вказано</span>';
     var bd=c.in_list?'<span class="by">&#10003; Так</span>':'<span class="bn">— Ні</span>';
     var nt=[c.notes,c.result].filter(function(n){return n&&n.trim()&&n!=='.';}).join(' | ');
     var ns=nt.length>52?nt.substring(0,52)+'…':nt;
     var cls=(c._email?'has-em':'no-em')+(c.added_at===ts()?' nr':'');
+    var isCold=isColdLead(c);
+    var tagHtml='';
+    if(c.tag&&TAG_INFO[c.tag]){
+      tagHtml='<span class="tagb" style="background:'+TAG_INFO[c.tag].color+'">'+TAG_INFO[c.tag].label+'</span> ';
+    }else if(isCold){
+      tagHtml='<span class="tagb" style="background:#6b7280">&#10052; Охолов</span> ';
+    }
     return '<tr class="'+cls+'" data-id="'+c.id+'">'
      +'<td class="ti" data-k="idx">'+(idx+1)+'</td>'
-     +'<td class="tc tc-edit" data-k="company" title="Натисніть для редагування: '+esc(c.company)+'" onclick="openEdit('+c.id+')">'+esc(c.company)+'</td>'
-     +'<td data-k="oblast"><span class="op">'+esc(c.oblast||'—')+'</span></td>'
-     +'<td data-k="contact" title="'+esc(c.contact||'')+'">'+esc(c.contact&&c.contact!='.'?c.contact:'—')+'</td>'
-     +'<td data-k="phone">'+esc(c.phone&&c.phone!='.'?c.phone:'—')+'</td>'
-     +'<td data-k="email">'+ec+'</td>'
-     +'<td data-k="edrpou" style="color:var(--muted)">'+esc(c.edrpou||'—')+'</td>'
-     +'<td data-k="delivery">'+(c.delivery?(
+     +'<td class="tc tc-edit" data-k="company" data-lbl="Підприємство" title="Натисніть для редагування: '+esc(c.company)+'" onclick="openEdit('+c.id+')">'+tagHtml+esc(c.company)+'</td>'
+     +'<td data-k="oblast" data-lbl="Область"><span class="op">'+esc(c.oblast||'—')+'</span></td>'
+     +'<td data-k="contact" data-lbl="Контакт" title="'+esc(c.contact||'')+'">'+esc(c.contact&&c.contact!='.'?c.contact:'—')+'</td>'
+     +'<td data-k="phone" data-lbl="Телефон">'+(c.phone&&c.phone!='.'?'<a class="qa-link" href="tel:'+esc(c.phone.replace(/[^\d+]/g,''))+'" onclick="event.stopPropagation()" title="Подзвонити">&#128222; '+esc(c.phone)+'</a>':'—')+'</td>'
+     +'<td data-k="email" data-lbl="Email">'+ec+'</td>'
+     +'<td data-k="edrpou" data-lbl="ЄДРПОУ" style="color:var(--muted)">'+esc(c.edrpou||'—')+'</td>'
+     +'<td data-k="delivery" data-lbl="Доставка">'+(c.delivery?(
        '<span title="'+esc(c.delivery_note||'')+'">'+esc(c.delivery)+'</span>'
        +(c.delivery_note?'<span style="font-size:10px;color:var(--muted);margin-left:4px" title="'+esc(c.delivery_note)+'">&#128204;</span>':'')
      ):'<span style="color:var(--muted2)">—</span>')+'</td>'
-     +'<td class="nc" data-k="notes"><span>'+esc(ns||'—')+'</span>'+(nt?'<div class="nf">'+esc(nt)+'</div>':'')+'</td>'
-     +'<td class="dc" data-k="contact_date">'+fD(c.contact_date)+'</td>'
-     +'<td class="'+dcls(c.next_contact)+'" data-k="next_contact">'+fD(c.next_contact)+'</td>'
-     +'<td class="dc" data-k="added_at">'+fD(c.added_at)+'</td>'
-     +'<td data-k="in_list"><button class="paybtn" onclick="event.stopPropagation();toggleInList('+c.id+')">'+bd+'</button></td>'
+     +'<td class="nc" data-k="notes" data-lbl="Нотатки"><span>'+esc(ns||'—')+'</span>'+(nt?'<div class="nf">'+esc(nt)+'</div>':'')+'</td>'
+     +'<td class="dc" data-k="contact_date" data-lbl="Дата контакту">'+fD(c.contact_date)+'</td>'
+     +'<td class="'+dcls(c.next_contact)+'" data-k="next_contact" data-lbl="Зв\'язатись">'+fD(c.next_contact)+'</td>'
+     +'<td class="dc" data-k="added_at" data-lbl="Дата в базі">'+fD(c.added_at)+'</td>'
+     +'<td data-k="in_list" data-lbl="Розсилка"><button class="paybtn" onclick="event.stopPropagation();toggleInList('+c.id+')">'+bd+'</button></td>'
      +'</tr>';
   }).join('');
   /* re-apply col visibility to new tds */
@@ -903,6 +1047,9 @@ function openAdd(){
   onDlChange();
   document.getElementById('fcd').value=ts();
   document.getElementById('fnc').value='';
+  selectTag('');
+  curHistory=[];
+  renderHistLog();
   document.getElementById('mainMo').classList.add('open');
   setTimeout(function(){document.getElementById('fc').focus();},120);
 }
@@ -925,6 +1072,9 @@ function openEdit(id){
   document.getElementById('fre').value=c.result||'';
   document.getElementById('fcd').value=c.contact_date||'';
   document.getElementById('fnc').value=c.next_contact||'';
+  selectTag(c.tag||'');
+  curHistory=Array.isArray(c.history)?c.history.slice():[];
+  renderHistLog();
   document.getElementById('mainMo').classList.add('open');
 }
 function delFromModal(){
@@ -951,6 +1101,8 @@ function saveMo(){
     result:document.getElementById('fre').value.trim(),
     contact_date:document.getElementById('fcd').value,
     next_contact:document.getElementById('fnc').value,
+    tag:curTag,
+    history:curHistory,
   };
   if(editId!==null){
     var c=clients.find(function(x){return x.id===editId;});
@@ -1133,6 +1285,43 @@ function onDlChange(){
   if(val==='Нова Пошта') lbl.textContent='Нова Пошта — відділення та місто';
   else if(val==='САТ')   lbl.textContent='САТ — відділення та місто';
   else                   lbl.textContent='Транспорт — адреса, місто або примітка';
+}
+
+/* ─ TAG PICKER ─ */
+function selectTag(tag){
+  curTag=tag;
+  document.querySelectorAll('.tagopt').forEach(function(b){
+    b.classList.toggle('sel',b.dataset.tag===tag);
+  });
+}
+document.getElementById('tagPicker').addEventListener('click',function(e){
+  var btn=e.target.closest('.tagopt');
+  if(!btn)return;
+  var tag=btn.dataset.tag;
+  selectTag(curTag===tag?'':tag);
+});
+
+/* ─ INTERACTION HISTORY ─ */
+function renderHistLog(){
+  var log=document.getElementById('histLog');
+  var sorted=curHistory.slice().sort(function(a,b){return b.date<a.date?-1:1;});
+  log.innerHTML=sorted.map(function(h,i){
+    var realIdx=curHistory.indexOf(h);
+    return '<div class="histitem"><span class="hdate">'+fD(h.date)+'</span>'+esc(h.text)
+      +'<button type="button" class="hdel" onclick="delHistEntry('+realIdx+')" title="Видалити запис">&#10005;</button></div>';
+  }).join('');
+}
+function addHistEntry(){
+  var inp=document.getElementById('histInput');
+  var text=inp.value.trim();
+  if(!text)return;
+  curHistory.push({date:ts(),text:text});
+  inp.value='';
+  renderHistLog();
+}
+function delHistEntry(idx){
+  curHistory.splice(idx,1);
+  renderHistLog();
 }
 
 /* ─ COLUMN RESIZE ─ */
